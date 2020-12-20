@@ -5,7 +5,7 @@ const development = {
 
 const production = {
   clientId: '6a53c434d5ce4fc2adb439113a5a7ec5',
-  redirectUrl: 'https://haszari.github.io/ajugi/',
+  redirectUrl: 'http://landscape.cartoonbeats.com/ajugi',
 };
 
 const spotifyApp = ( process.env.NODE_ENV === 'production' ) ? production : development;
