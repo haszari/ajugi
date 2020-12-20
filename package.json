@@ -2,6 +2,10 @@
   "name": "ajugi-playlist-webapp",
   "version": "0.1.0",
   "private": true,
+  "repository": {
+    "type" : "git",
+    "url" : "git@github.com:haszari/ajugi.git"
+  },
   "dependencies": {
     "@material-ui/core": "^4.11.0",
     "@material-ui/icons": "^4.9.1",
@@ -9,7 +13,6 @@
     "@testing-library/jest-dom": "^4.2.4",
     "@testing-library/react": "^9.3.2",
     "@testing-library/user-event": "^7.1.2",
-    "lodash": "^4.17.19",
     "prettier": "2.0.5",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
@@ -20,6 +23,7 @@
   "scripts": {
     "start": "react-scripts start",
     "build": "NODE_ENV=production react-scripts build",
+    "deploy:prebuilt": "gh-pages -d build",
     "deploy": "npm run build && gh-pages -d build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
@@ -40,6 +44,7 @@
     ]
   },
   "devDependencies": {
-    "gh-pages": "^3.1.0"
+    "gh-pages": "^3.1.0",
+    "lodash": "^4.17.20"
   }
 }
