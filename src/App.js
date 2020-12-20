@@ -11,7 +11,6 @@ import theme from "./theme";
 
 import store from "./store/store.js";
 
-import AuthoriseSpotify from "./components/AuthoriseSpotify.js";
 import Playlists from "./components/Playlists.js";
 
 function App() {
@@ -22,8 +21,7 @@ function App() {
         <Router>
           <Provider store={store}>
             <Switch>
-              <Route path="/callback" children={<Playlists />} />
-              <Route path="/" children={<AuthoriseSpotify />} />
+              <Route path="/" children={<Playlists />} />
             </Switch>
           </Provider>
         </Router>

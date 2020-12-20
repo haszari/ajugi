@@ -1,5 +1,8 @@
 import React, { useState, useEffect } from "react";
 
+
+import AuthoriseSpotify from "./AuthoriseSpotify.js";
+
 import { baseUrl, spotifyFetch } from "../lib/spotify-api";
 
 import useUrlHashParams from "../lib/useUrlHashParams.js";
@@ -12,7 +15,7 @@ function Playlists() {
   // If playlists are empty, fetch em.
   // This is basically a demo/temporary.
   useEffect( () => {
-    if (playlists.length > 0 ) { return };
+    if ( playlists.length > 0 || ! spotifyAccessToken ) { return };
 
     spotifyFetch( {
       spotifyAccessToken, 
@@ -21,7 +24,11 @@ function Playlists() {
       console.log( response.items );
       setPlaylists( response.items );
     } );  
-  }, [ playlists, setPlaylists ] );
+  }, [ spotifyAccessToken, playlists, setPlaylists ] );
+
+  if ( ! spotifyAccessToken ) {
+    return (<AuthoriseSpotify />);
+  }
 
   return (
     <>
