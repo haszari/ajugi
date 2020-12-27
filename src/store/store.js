@@ -1,11 +1,15 @@
-import { configureStore } from '@reduxjs/toolkit';
+import { configureStore } from "@reduxjs/toolkit";
 
-import app from './app/slice';
+import spotifyClient from "./spotify-client";
 
-const store = configureStore( {
+// legacy .. maybe unused
+import app from "./app/slice";
+
+const store = configureStore({
   reducer: {
     app,
-  }
-} );
+    spotifyClient,
+  },
+});
 
 export default store;
