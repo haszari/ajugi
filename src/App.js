@@ -1,6 +1,6 @@
-import React from "react";
+import React, { useEffect } from "react";
 
-import { Provider } from "react-redux";
+import { Provider, useSelector } from "react-redux";
 
 import { BrowserRouter as Router } from "react-router-dom";
 
@@ -11,6 +11,8 @@ import Container from "@material-ui/core/Container";
 import theme from "./theme";
 
 import store from "./store/store.js";
+import { setApiToken } from "./store/spotify-client";
+import { getApiToken } from "./store/spotify-client/selectors";
 
 import AuthoriseSpotify from "./components/AuthoriseSpotify.js";
 import Playlists from "./components/Playlists.js";
@@ -20,13 +22,31 @@ import useUrlHashParams from "./lib/useUrlHashParams.js";
 // Main application content component.
 // Logic for determining what view to show (e.g. auth or playlists).
 function AppContent() {
-  const { access_token: spotifyAccessToken } = useUrlHashParams();
+  // Wrangle our API token.
+  // The token is delivered from Spotify API via `#access_token` url param.
+  // We store it in our redux state.
+  // We use an effect to persist the token to local storage, or use a
+  // previously-saved token, by dispatching action to update store.
+  const { access_token: urlApiToken } = useUrlHashParams();
+  const apiToken = useSelector(getApiToken);
 
-  if (!spotifyAccessToken) {
+  useEffect(() => {
+    const savedApiToken = window.localStorage.getItem("apiToken");
+    if (urlApiToken && savedApiToken !== urlApiToken) {
+      // New token in URL - persist to storage for next time.
+      window.localStorage.setItem("apiToken", urlApiToken);
+      store.dispatch(setApiToken({ apiToken: urlApiToken }));
+    } else {
+      // No new token - use the saved one.
+      store.dispatch(setApiToken({ apiToken: savedApiToken }));
+    }
+  }, [urlApiToken]);
+
+  if (!apiToken) {
     return <AuthoriseSpotify />;
   }
 
-  return <Playlists spotifyAccessToken={spotifyAccessToken} />;
+  return <Playlists />;
 }
 
 // Top-level app component with theme, store provider etc.

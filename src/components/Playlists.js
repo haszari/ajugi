@@ -1,30 +1,34 @@
 import React, { useState, useEffect } from "react";
 
+import { useSelector } from "react-redux";
+
 import { baseUrl, spotifyFetch } from "../lib/spotify-api";
 
-// temporarily pass token as a prop
-function Playlists({ spotifyAccessToken }) {
+import { getApiToken } from "../store/spotify-client/selectors";
+
+function Playlists() {
   const [playlists, setPlaylists] = useState([]);
+
+  const apiToken = useSelector(getApiToken);
 
   // If playlists are empty, fetch em.
   // This is basically a demo/temporary.
   useEffect(() => {
-    if (playlists.length > 0 || !spotifyAccessToken) {
+    if (playlists.length > 0 || !apiToken) {
       return;
     }
 
     spotifyFetch({
-      spotifyAccessToken,
+      spotifyAccessToken: apiToken,
       url: baseUrl + "me/playlists",
     }).then((response) => {
-      console.log(response.items);
-      setPlaylists(response.items);
+      setPlaylists(response?.items);
     });
-  }, [spotifyAccessToken, playlists, setPlaylists]);
+  }, [apiToken, playlists, setPlaylists]);
 
   return (
     <>
-      {playlists.map((playlist) => (
+      {playlists?.map((playlist) => (
         <div key={playlist.id}>{playlist.name}</div>
       ))}
     </>
