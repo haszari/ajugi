@@ -7,6 +7,7 @@ const slice = createSlice({
   initialState: {
     status: "idle",
     playlists: [],
+    selectedPlaylistId: "",
   },
   reducers: {
     setStatus(state, action) {
@@ -14,6 +15,9 @@ const slice = createSlice({
     },
     playlistsReceived(state, action) {
       state.playlists.push(...action.payload.items);
+    },
+    setSelectedPlaylistId(state, action) {
+      state.selectedPlaylistId = action.payload.selectedPlaylistId;
     },
   },
 });
@@ -38,7 +42,7 @@ const fetchPlaylists = ({ spotifyAccessToken }) => async (dispatch, state) => {
 };
 
 const { actions, reducer } = slice;
-const { setStatus, playlistsReceived } = actions;
+const { setStatus, playlistsReceived, setSelectedPlaylistId } = actions;
 
-export { playlistsReceived, fetchPlaylists };
+export { playlistsReceived, fetchPlaylists, setSelectedPlaylistId };
 export default reducer;
