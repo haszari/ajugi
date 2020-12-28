@@ -1,30 +1,24 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect } from "react";
 
 import { useSelector } from "react-redux";
 
-import { baseUrl, spotifyFetch } from "../lib/spotify-api";
+import store from "../store/store.js";
 
 import { getApiToken } from "../store/spotify-client/selectors";
+import { fetchPlaylists } from "../store/playlists";
+import { getPlaylists } from "../store/playlists/selectors";
 
 function Playlists() {
-  const [playlists, setPlaylists] = useState([]);
-
   const apiToken = useSelector(getApiToken);
+  const playlists = useSelector(getPlaylists);
 
-  // If playlists are empty, fetch em.
-  // This is basically a demo/temporary.
+  // If there are no playlists, dispatch load action.
   useEffect(() => {
     if (playlists.length > 0 || !apiToken) {
       return;
     }
-
-    spotifyFetch({
-      spotifyAccessToken: apiToken,
-      url: baseUrl + "me/playlists",
-    }).then((response) => {
-      setPlaylists(response?.items);
-    });
-  }, [apiToken, playlists, setPlaylists]);
+    store.dispatch(fetchPlaylists({ spotifyAccessToken: apiToken }));
+  }, [apiToken, playlists]);
 
   return (
     <>
