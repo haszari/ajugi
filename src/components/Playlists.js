@@ -2,6 +2,9 @@ import React, { useEffect } from "react";
 
 import { useSelector } from "react-redux";
 
+import List from "@material-ui/core/List";
+import ListItem from "@material-ui/core/ListItem";
+
 import store from "../store/store.js";
 
 import { getApiToken } from "../store/spotify-client/selectors";
@@ -24,27 +27,22 @@ function Playlists() {
     store.dispatch(fetchPlaylists({ spotifyAccessToken: apiToken }));
   }, [apiToken, playlists]);
 
-  const selectedStyle = {
-    backgroundColor: "orange",
-  };
-
   return (
-    <>
+    <List className="primary">
       {playlists?.map((playlist) => (
-        <div
+        <ListItem
           key={playlist.id}
-          style={selectedPlaylistId === playlist.id ? selectedStyle : null}
+          selected={selectedPlaylistId === playlist.id}
           onClick={() => {
-            console.log("what");
             store.dispatch(
               setSelectedPlaylistId({ selectedPlaylistId: playlist.id })
             );
           }}
         >
           {playlist.name}
-        </div>
+        </ListItem>
       ))}
-    </>
+    </List>
   );
 }
 
