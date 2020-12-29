@@ -7,7 +7,7 @@ import ListItem from "@material-ui/core/ListItem";
 
 import store from "../store/store.js";
 
-import { getApiToken } from "../store/spotify-client/selectors";
+import { getApiToken } from "../store/app/selectors";
 import { fetchPlaylists, setSelectedPlaylistId } from "../store/playlists";
 import {
   getPlaylists,

@@ -11,8 +11,8 @@ import Container from "@material-ui/core/Container";
 import theme from "./theme";
 
 import store from "./store/store.js";
-import { setApiToken } from "./store/spotify-client";
-import { getApiToken } from "./store/spotify-client/selectors";
+import { setApiToken } from "./store/app";
+import { getApiToken } from "./store/app/selectors";
 
 import AuthoriseSpotify from "./components/AuthoriseSpotify.js";
 import Playlists from "./components/Playlists.js";
