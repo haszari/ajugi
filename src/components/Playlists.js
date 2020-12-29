@@ -2,12 +2,14 @@ import React, { useEffect } from "react";
 
 import { useSelector } from "react-redux";
 
+import Button from "@material-ui/core/Button";
 import List from "@material-ui/core/List";
 import ListItem from "@material-ui/core/ListItem";
 
 import store from "../store/store.js";
 
 import { getApiToken } from "../store/app/selectors";
+import { setView } from "../store/app";
 import { fetchPlaylists, setSelectedPlaylistId } from "../store/playlists";
 import {
   getPlaylists,
@@ -27,22 +29,37 @@ function Playlists() {
     store.dispatch(fetchPlaylists({ spotifyAccessToken: apiToken }));
   }, [apiToken, playlists]);
 
+  const button = selectedPlaylistId ? (
+    <Button
+      variant="contained"
+      color="primary"
+      onClick={() => {
+        store.dispatch(setView({ view: "albums" }));
+      }}
+    >
+      Show Albums
+    </Button>
+  ) : null;
+
   return (
-    <List className="primary">
-      {playlists?.map((playlist) => (
-        <ListItem
-          key={playlist.id}
-          selected={selectedPlaylistId === playlist.id}
-          onClick={() => {
-            store.dispatch(
-              setSelectedPlaylistId({ selectedPlaylistId: playlist.id })
-            );
-          }}
-        >
-          {playlist.name}
-        </ListItem>
-      ))}
-    </List>
+    <>
+      <List className="primary">
+        {playlists?.map((playlist) => (
+          <ListItem
+            key={playlist.id}
+            selected={selectedPlaylistId === playlist.id}
+            onClick={() => {
+              store.dispatch(
+                setSelectedPlaylistId({ selectedPlaylistId: playlist.id })
+              );
+            }}
+          >
+            {playlist.name}
+          </ListItem>
+        ))}
+      </List>
+      {button}
+    </>
   );
 }
 

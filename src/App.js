@@ -12,10 +12,11 @@ import theme from "./theme";
 
 import store from "./store/store.js";
 import { setApiToken } from "./store/app";
-import { getApiToken } from "./store/app/selectors";
+import { getApiToken, getView } from "./store/app/selectors";
 
 import AuthoriseSpotify from "./components/AuthoriseSpotify.js";
 import Playlists from "./components/Playlists.js";
+import Albums from "./components/Albums.js";
 
 import useUrlHashParams from "./lib/useUrlHashParams.js";
 
@@ -29,6 +30,7 @@ function AppContent() {
   // previously-saved token, by dispatching action to update store.
   const { access_token: urlApiToken } = useUrlHashParams();
   const apiToken = useSelector(getApiToken);
+  const view = useSelector(getView);
 
   useEffect(() => {
     const savedApiToken = window.localStorage.getItem("apiToken");
@@ -46,7 +48,13 @@ function AppContent() {
     return <AuthoriseSpotify />;
   }
 
-  return <Playlists />;
+  if (view === "playlists") {
+    return <Playlists />;
+  }
+
+  if (view === "albums") {
+    return <Albums />;
+  }
 }
 
 // Top-level app component with theme, store provider etc.

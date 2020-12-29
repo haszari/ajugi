@@ -19,7 +19,7 @@ const slice = createSlice({
 const clearStaleApiToken = () => setApiToken({ apiToken: "" });
 
 const { actions, reducer } = slice;
-const { setApiToken } = actions;
+const { setApiToken, setView } = actions;
 
-export { clearStaleApiToken, setApiToken };
+export { clearStaleApiToken, setApiToken, setView };
 export default reducer;
