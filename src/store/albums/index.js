@@ -14,7 +14,7 @@ const appSlice = createSlice({
       offset: 0,
       limit: 100,
     },
-    groups: [],
+    albums: [],
   },
   reducers: {
     setPlaylistId(state, action) {
@@ -38,8 +38,7 @@ const appSlice = createSlice({
       };
     },
     showAlbums(state, action) {
-      state.groups = groupBy(state.songs, (song) => song?.track?.album?.id);
-      state.view = "albums";
+      state.albums = groupBy(state.songs, (song) => song?.track?.album?.id);
 
       // get cover art in ..
       // song?.track?.album?.images[0].url
@@ -83,6 +82,8 @@ const fetchSongs = ({ spotifyAccessToken }) => async (dispatch, state) => {
   }
 
   dispatch(setStatus("loaded"));
+
+  dispatch(showAlbums());
 };
 
 export {
