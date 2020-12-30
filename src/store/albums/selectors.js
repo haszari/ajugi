@@ -1,11 +1,11 @@
-export const getPlaylistId = (state) => state.app.playlistId;
+export const getPlaylistId = (state) => state.albums.playlistId;
 
-export const getLoading = (state) => state.app.loading;
+export const getStatus = (state) => state.albums.status;
 
-export const getPagination = (state) => state.app.pagination;
+export const getPagination = (state) => state.albums.pagination;
 
-export const getSongs = (state) => state.app.songs;
+export const getSongs = (state) => state.albums.songs;
 
-export const getGroups = (state) => state.app.groups;
+export const getGroups = (state) => state.albums.groups;
 
-export const getView = (state) => state.app.view;
+export const getView = (state) => state.albums.view;

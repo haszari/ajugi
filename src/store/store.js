@@ -2,7 +2,7 @@ import { configureStore } from "@reduxjs/toolkit";
 
 import app from "./app";
 import playlists from "./playlists";
-import albums from "./albums/slice";
+import albums from "./albums";
 
 const store = configureStore({
   reducer: {

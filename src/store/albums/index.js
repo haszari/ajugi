@@ -9,7 +9,7 @@ const appSlice = createSlice({
   name: "albums",
   initialState: {
     playlistId: "", // Interested
-    loading: "idle",
+    status: "idle",
     pagination: {
       offset: 0,
       limit: 100,
@@ -18,7 +18,7 @@ const appSlice = createSlice({
   },
   reducers: {
     setPlaylistId(state, action) {
-      state.playlistId = action.payload;
+      state.playlistId = action.payload.playlistId;
       // reset pagination, song list
       state.pagination = {
         offset: 0,
@@ -26,11 +26,8 @@ const appSlice = createSlice({
       };
       state.songs = [];
     },
-    startLoading(state, action) {
-      state.loading = "loading";
-    },
-    finishLoading(state, action) {
-      state.loading = "loaded";
+    setStatus(state, action) {
+      state.status = action.payload;
     },
     songsReceived(state, action) {
       state.songs.push(...action.payload.items);
@@ -54,15 +51,14 @@ const appSlice = createSlice({
 const { actions, reducer } = appSlice;
 const {
   setPlaylistId,
-  startLoading,
-  finishLoading,
+  setStatus,
   songsReceived,
   showArtists,
   showAlbums,
 } = actions;
 
 const fetchSongs = ({ spotifyAccessToken }) => async (dispatch, state) => {
-  dispatch(startLoading());
+  dispatch(setStatus("loading"));
 
   const current = state();
   const playlistId = getPlaylistId(current);
@@ -86,13 +82,12 @@ const fetchSongs = ({ spotifyAccessToken }) => async (dispatch, state) => {
     console.log(error);
   }
 
-  dispatch(finishLoading());
+  dispatch(setStatus("loaded"));
 };
 
 export {
   setPlaylistId,
-  startLoading,
-  finishLoading,
+  setStatus,
   songsReceived,
   showArtists,
   showAlbums,
