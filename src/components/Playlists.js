@@ -10,6 +10,7 @@ import store from "../store/store.js";
 
 import { getApiToken } from "../store/app/selectors";
 import { setView } from "../store/app";
+import { setPlaylistId } from "../store/albums";
 import { fetchPlaylists, setSelectedPlaylistId } from "../store/playlists";
 import {
   getPlaylists,
@@ -34,6 +35,7 @@ function Playlists() {
       variant="contained"
       color="primary"
       onClick={() => {
+        store.dispatch(setPlaylistId({ playlistId: selectedPlaylistId }));
         store.dispatch(setView({ view: "albums" }));
       }}
     >
