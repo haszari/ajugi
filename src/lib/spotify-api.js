@@ -1,5 +1,5 @@
 import store from "../store/store.js";
-import { clearStaleApiToken } from "../store/spotify-client";
+import { clearStaleApiToken } from "../store/app";
 
 const baseUrl = "https://api.spotify.com/v1/";
 
