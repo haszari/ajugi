@@ -1,9 +1,17 @@
 .Albums-container {
   display: grid;
-  grid-template-columns: repeat(auto-fit, 100px);
+  grid-template-columns: repeat(auto-fill, 100px);
   grid-gap: 1em;
 
   img.album {
+    grid-column: span 3;
+    grid-row: span 3;
+
+    width: calc(300px + 2em);
+    height: calc(300px + 2em);
+  }
+
+  img.ep {
     grid-column: span 2;
     grid-row: span 2;
 
@@ -11,7 +19,7 @@
     height: calc(200px + 1em);
   }
 
-  img.ep {
+  img.single {
     width: 100px;
     height: 100px;
   }

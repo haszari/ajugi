@@ -18,9 +18,12 @@ function Album({ id, albumSongs }) {
 
   const coverImageUrl = album.images[0].url;
   const title = album.name;
-  const classes = album.total_tracks > 7 ? "album" : "ep";
+  let releaseType = "album";
+  if (album.total_tracks < 7) {
+    releaseType = album.total_tracks > 3 ? "ep" : "single";
+  }
 
-  return <img className={classes} src={coverImageUrl} alt={title} />;
+  return <img className={releaseType} src={coverImageUrl} alt={title} />;
 }
 
 function Albums() {
