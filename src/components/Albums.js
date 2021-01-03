@@ -2,29 +2,13 @@ import React, { useEffect } from "react";
 
 import { useSelector } from "react-redux";
 
-import { makeStyles } from "@material-ui/core/styles";
-import GridList from "@material-ui/core/GridList";
-import GridListTile from "@material-ui/core/GridListTile";
-
 import store from "../store/store.js";
 
 import { fetchSongs } from "../store/albums";
 import { getStatus, getAlbums } from "../store/albums/selectors";
 import { getApiToken } from "../store/app/selectors";
 
-const useStyles = makeStyles((theme) => ({
-  root: {
-    display: "flex",
-    flexWrap: "wrap",
-    justifyContent: "space-around",
-    overflow: "hidden",
-    backgroundColor: theme.palette.background.paper,
-  },
-  gridList: {
-    width: 500,
-    height: 450,
-  },
-}));
+import "./Albums.scss";
 
 function Album({ id, albumSongs }) {
   const album = albumSongs[0]?.track?.album;
@@ -34,20 +18,15 @@ function Album({ id, albumSongs }) {
 
   const coverImageUrl = album.images[0].url;
   const title = album.name;
+  const classes = albumSongs.length > 7 ? "album" : "ep";
 
-  return (
-    <GridListTile key={id} cols={1}>
-      <img src={coverImageUrl} alt={title} />
-    </GridListTile>
-  );
+  return <img className={classes} src={coverImageUrl} alt={title} />;
 }
 
 function Albums() {
   const status = useSelector(getStatus);
   const spotifyAccessToken = useSelector(getApiToken);
   const albums = useSelector(getAlbums);
-
-  const classes = useStyles();
 
   // Start loading songs on mount.
   useEffect(() => {
@@ -62,11 +41,11 @@ function Albums() {
     return "Grouping albums…";
   }
 
-  return Object.entries(albums).map(([id, albumSongs]) => (
-    <GridList cellHeight={160} className={classes.gridList} cols={3}>
-      <Album key={id} id={id} albumSongs={albumSongs} />
-    </GridList>
+  const cells = Object.entries(albums).map(([id, albumSongs]) => (
+    <Album key={id} id={id} albumSongs={albumSongs} />
   ));
+
+  return <div className="Albums-container">{cells}</div>;
 }
 
 export default Albums;

@@ -1,0 +1,18 @@
+.Albums-container {
+  display: grid;
+  grid-template-columns: 100px 100px 100px 100px 100px 100px 100px;
+  grid-gap: 1em;
+
+  img.album {
+    grid-column: span 2;
+    grid-row: span 2;
+
+    width: calc(200px + 1em);
+    height: calc(200px + 1em);
+  }
+
+  img.ep {
+    width: 100px;
+    height: 100px;
+  }
+}
