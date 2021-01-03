@@ -4,6 +4,8 @@ Experimenting with different ways of browsing Spotify playlists - e.g. by artist
 
 Live on [GitHub Pages](https://pages.github.com): https://landscape.cartoonbeats.com/ajugi/
 
+![screenshot](docs/screenshot.png)
+
 ## How to use
 
 (tbc)
