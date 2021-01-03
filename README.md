@@ -4,7 +4,7 @@ Experimenting with different ways of visualising Spotify playlists - e.g. by art
 
 Live on [GitHub Pages](https://pages.github.com): https://landscape.cartoonbeats.com/ajugi/
 
-![screenshot](doc/screenshot.png)
+<a href="https://landscape.cartoonbeats.com/ajugi/">![screenshot](doc/screenshot.png)</a>
 
 ## How to use
 
