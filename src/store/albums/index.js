@@ -6,23 +6,19 @@ import { spotifyFetch, playlistUrl } from "../../lib/spotify-api";
 import { getPlaylistId, getPagination } from "./selectors";
 
 const appSlice = createSlice({
-  name: "app",
+  name: "albums",
   initialState: {
-    playlistId: "43m3aAgpbJnoanT48x8ZKI", // Interested
-    // playlistId: "2P3C1iQgwoOnSEQKSRmDTw", // Starland Classical
-    loading: "idle",
+    playlistId: "", // Interested
+    status: "idle",
     pagination: {
       offset: 0,
       limit: 100,
     },
-    view: "songs",
-    songs: [],
-    groupedBy: "",
-    groups: [],
+    albums: [],
   },
   reducers: {
     setPlaylistId(state, action) {
-      state.playlistId = action.payload;
+      state.playlistId = action.payload.playlistId;
       // reset pagination, song list
       state.pagination = {
         offset: 0,
@@ -30,11 +26,8 @@ const appSlice = createSlice({
       };
       state.songs = [];
     },
-    startLoading(state, action) {
-      state.loading = "loading";
-    },
-    finishLoading(state, action) {
-      state.loading = "loaded";
+    setStatus(state, action) {
+      state.status = action.payload;
     },
     songsReceived(state, action) {
       state.songs.push(...action.payload.items);
@@ -44,16 +37,8 @@ const appSlice = createSlice({
         offset,
       };
     },
-    showArtists(state, action) {
-      state.groups = groupBy(
-        state.songs,
-        (song) => song?.track?.artists[0]?.id
-      );
-      state.view = "artists";
-    },
     showAlbums(state, action) {
-      state.groups = groupBy(state.songs, (song) => song?.track?.album?.id);
-      state.view = "albums";
+      state.albums = groupBy(state.songs, (song) => song?.track?.album?.id);
 
       // get cover art in ..
       // song?.track?.album?.images[0].url
@@ -65,15 +50,14 @@ const appSlice = createSlice({
 const { actions, reducer } = appSlice;
 const {
   setPlaylistId,
-  startLoading,
-  finishLoading,
+  setStatus,
   songsReceived,
   showArtists,
   showAlbums,
 } = actions;
 
 const fetchSongs = ({ spotifyAccessToken }) => async (dispatch, state) => {
-  dispatch(startLoading());
+  dispatch(setStatus("loading"));
 
   const current = state();
   const playlistId = getPlaylistId(current);
@@ -97,13 +81,14 @@ const fetchSongs = ({ spotifyAccessToken }) => async (dispatch, state) => {
     console.log(error);
   }
 
-  dispatch(finishLoading());
+  dispatch(setStatus("loaded"));
+
+  dispatch(showAlbums());
 };
 
 export {
   setPlaylistId,
-  startLoading,
-  finishLoading,
+  setStatus,
   songsReceived,
   showArtists,
   showAlbums,
