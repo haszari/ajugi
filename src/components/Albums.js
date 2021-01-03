@@ -16,7 +16,7 @@ function Album({ id, albumSongs }) {
     return null;
   }
 
-  const coverImageUrl = album.images[0].url;
+  const coverImageUrl = album.images[0]?.url;
   const title = album.name;
   let releaseType = "album";
   if (album.total_tracks < 7) {
