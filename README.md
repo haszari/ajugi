@@ -1,6 +1,6 @@
 # Ajugi - Spotify playlist explorer
 
-Experimenting with different ways of browsing Spotify playlists - e.g. by artist or album.
+Experimenting with different ways of visualising Spotify playlists - e.g. by artist or album.
 
 Live on [GitHub Pages](https://pages.github.com): https://landscape.cartoonbeats.com/ajugi/
 
