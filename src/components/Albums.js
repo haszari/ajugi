@@ -22,8 +22,10 @@ function Album({ id, albumSongs, isSelected }) {
     return null;
   }
 
-  const coverImageUrl = album.images[0]?.url;
+  const artist = album?.artists[0]?.name;
   const title = album.name;
+  const releaseDate = album.release_date;
+  const coverImageUrl = album.images[0]?.url;
   let releaseType = "album";
   if (album.total_tracks < 7) {
     releaseType = album.total_tracks > 3 ? "ep" : "single";
@@ -37,13 +39,24 @@ function Album({ id, albumSongs, isSelected }) {
     }
   };
 
+  const infoBox = isSelected ? (
+    <div className="info">
+      <div className="artist">{artist}</div>
+      <div className="title">{title}</div>
+      <div className="releaseDate">{releaseDate}</div>
+    </div>
+  ) : null;
+
   return (
-    <img
-      onClick={onCoverClick}
-      className={classnames(releaseType, { isSelected })}
-      src={coverImageUrl}
-      alt={title}
-    />
+    <>
+      <img
+        onClick={onCoverClick}
+        className={classnames(releaseType, { isSelected })}
+        src={coverImageUrl}
+        alt={title}
+      />
+      {infoBox}
+    </>
   );
 }
 
