@@ -48,15 +48,10 @@ function Album({ id, albumSongs, isSelected }) {
   ) : null;
 
   return (
-    <>
-      <img
-        onClick={onCoverClick}
-        className={classnames(releaseType, { isSelected })}
-        src={coverImageUrl}
-        alt={title}
-      />
+    <div className={classnames("release", releaseType, { isSelected })}>
+      <img onClick={onCoverClick} src={coverImageUrl} alt={title} />
       {infoBox}
-    </>
+    </div>
   );
 }
 
