@@ -2,15 +2,21 @@ import React, { useEffect } from "react";
 
 import { useSelector } from "react-redux";
 
+import classnames from "classnames";
+
 import store from "../store/store.js";
 
-import { fetchSongs } from "../store/albums";
-import { getStatus, getAlbums } from "../store/albums/selectors";
+import { fetchSongs, setSelectedAlbumId } from "../store/albums";
+import {
+  getStatus,
+  getAlbums,
+  getSelectedAlbumId,
+} from "../store/albums/selectors";
 import { getApiToken } from "../store/app/selectors";
 
 import "./Albums.scss";
 
-function Album({ id, albumSongs }) {
+function Album({ id, albumSongs, isSelected }) {
   const album = albumSongs[0]?.track?.album;
   if (!album) {
     return null;
@@ -23,12 +29,28 @@ function Album({ id, albumSongs }) {
     releaseType = album.total_tracks > 3 ? "ep" : "single";
   }
 
-  return <img className={releaseType} src={coverImageUrl} alt={title} />;
+  const onCoverClick = () => {
+    if (isSelected) {
+      store.dispatch(setSelectedAlbumId(""));
+    } else {
+      store.dispatch(setSelectedAlbumId(id));
+    }
+  };
+
+  return (
+    <img
+      onClick={onCoverClick}
+      className={classnames(releaseType, { isSelected })}
+      src={coverImageUrl}
+      alt={title}
+    />
+  );
 }
 
 function Albums() {
   const status = useSelector(getStatus);
   const spotifyAccessToken = useSelector(getApiToken);
+  const selectedAlbumId = useSelector(getSelectedAlbumId);
   const albums = useSelector(getAlbums);
 
   // Start loading songs on mount.
@@ -45,7 +67,12 @@ function Albums() {
   }
 
   const cells = Object.entries(albums).map(([id, albumSongs]) => (
-    <Album key={id} id={id} albumSongs={albumSongs} />
+    <Album
+      key={id}
+      id={id}
+      albumSongs={albumSongs}
+      isSelected={id === selectedAlbumId}
+    />
   ));
 
   return <div className="Albums-container">{cells}</div>;
