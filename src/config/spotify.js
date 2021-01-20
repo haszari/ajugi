@@ -14,4 +14,4 @@ const production = {
 const spotifyApp =
   process.env.NODE_ENV === "production" ? production : development;
 
-export default { spotifyApp, ...scopes };
+export default { ...spotifyApp, scopes };
