@@ -19,6 +19,19 @@ async function spotifyFetch({ spotifyAccessToken, url }) {
   return [];
 }
 
+function playItem({ spotifyAccessToken, uri }) {
+  const playStartUrl = new URL(`${baseUrl}me/player/play`);
+  fetch(playStartUrl, {
+    method: "PUT",
+    headers: {
+      Authorization: `Bearer ${spotifyAccessToken}`,
+    },
+    body: JSON.stringify({
+      context_uri: uri,
+    }),
+  });
+}
+
 function playlistUrl({ playlistId, offset = 0, limit = 100 }) {
   const playlistUrl = new URL(`${baseUrl}playlists/${playlistId}/tracks`);
   playlistUrl.searchParams.append("offset", offset);
@@ -26,4 +39,4 @@ function playlistUrl({ playlistId, offset = 0, limit = 100 }) {
   return playlistUrl.href;
 }
 
-export { baseUrl, spotifyFetch, playlistUrl };
+export { baseUrl, spotifyFetch, playItem, playlistUrl };

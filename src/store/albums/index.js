@@ -14,7 +14,9 @@ const appSlice = createSlice({
       offset: 0,
       limit: 100,
     },
-    albums: [],
+    // albums, keyed by spotify id
+    albums: {},
+    selectedAlbumId: "",
   },
   reducers: {
     setPlaylistId(state, action) {
@@ -39,10 +41,9 @@ const appSlice = createSlice({
     },
     showAlbums(state, action) {
       state.albums = groupBy(state.songs, (song) => song?.track?.album?.id);
-
-      // get cover art in ..
-      // song?.track?.album?.images[0].url
-      // or sort images by image.size - probably always biggest in [0] though
+    },
+    setSelectedAlbumId(state, action) {
+      state.selectedAlbumId = action.payload;
     },
   },
 });
@@ -51,6 +52,7 @@ const { actions, reducer } = appSlice;
 const {
   setPlaylistId,
   setStatus,
+  setSelectedAlbumId,
   songsReceived,
   showArtists,
   showAlbums,
@@ -90,6 +92,7 @@ export {
   setPlaylistId,
   setStatus,
   songsReceived,
+  setSelectedAlbumId,
   showArtists,
   showAlbums,
   fetchSongs,
