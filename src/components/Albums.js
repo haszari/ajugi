@@ -6,6 +6,8 @@ import Button from "@material-ui/core/Button";
 
 import classnames from "classnames";
 
+import { playItem } from "../lib/spotify-api";
+
 import store from "../store/store.js";
 
 import { fetchSongs, setSelectedAlbumId } from "../store/albums";
@@ -19,15 +21,17 @@ import { getApiToken } from "../store/app/selectors";
 import "./Albums.scss";
 
 function Album({ id, albumSongs, isSelected }) {
+  const spotifyAccessToken = useSelector(getApiToken);
   const album = albumSongs[0]?.track?.album;
   if (!album) {
     return null;
   }
 
-  const artist = album?.artists[0]?.name;
+  const artist = album.artists[0]?.name;
   const title = album.name;
   const releaseDate = album.release_date;
   const coverImageUrl = album.images[0]?.url;
+  const uri = album.uri;
   let releaseType = "album";
   if (album.total_tracks < 7) {
     releaseType = album.total_tracks > 3 ? "ep" : "single";
@@ -42,7 +46,7 @@ function Album({ id, albumSongs, isSelected }) {
   };
 
   const playAlbum = () => {
-    console.log("tbp");
+    playItem({ spotifyAccessToken, uri });
   };
 
   const infoBox = isSelected ? (
