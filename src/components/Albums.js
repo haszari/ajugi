@@ -2,6 +2,8 @@ import React, { useEffect } from "react";
 
 import { useSelector } from "react-redux";
 
+import Button from "@material-ui/core/Button";
+
 import classnames from "classnames";
 
 import store from "../store/store.js";
@@ -39,11 +41,19 @@ function Album({ id, albumSongs, isSelected }) {
     }
   };
 
+  const playAlbum = () => {
+    console.log("tbp");
+  };
+
   const infoBox = isSelected ? (
     <div className="info">
       <div className="artist">{artist}</div>
       <div className="title">{title}</div>
       <div className="releaseDate">{releaseDate}</div>
+
+      <Button variant="contained" color="primary" onClick={playAlbum}>
+        Play
+      </Button>
     </div>
   ) : null;
 
