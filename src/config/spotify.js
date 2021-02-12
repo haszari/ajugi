@@ -1,5 +1,5 @@
 const scopes =
-  "user-read-private user-read-email streaming app-remote-control user-modify-playback-state";
+  "user-read-private user-read-email streaming app-remote-control user-modify-playback-state playlist-modify-public playlist-modify-private";
 
 const development = {
   clientId: "db0460271efc4ab4b5f52fbe09ea4358",

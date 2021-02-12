@@ -3,11 +3,18 @@ import { clearStaleApiToken } from "../store/app";
 
 const baseUrl = "https://api.spotify.com/v1/";
 
-async function spotifyFetch({ spotifyAccessToken, url }) {
+async function spotifyFetch({
+  spotifyAccessToken,
+  url,
+  method = "GET",
+  body = null,
+}) {
   const response = await fetch(url, {
+    method,
     headers: {
       Authorization: `Bearer ${spotifyAccessToken}`,
     },
+    body: body ? JSON.stringify(body) : undefined,
   });
 
   if (response.ok) {
