@@ -15,8 +15,11 @@ import { setApiToken } from "./store/app";
 import { getApiToken, getView } from "./store/app/selectors";
 
 import AuthoriseSpotify from "./components/AuthoriseSpotify.js";
+
 import Playlists from "./components/Playlists.js";
 import Albums from "./components/Albums.js";
+
+import PlaylistImporter from "./components/PlaylistImporter.js";
 
 import useUrlHashParams from "./lib/useUrlHashParams.js";
 
@@ -54,6 +57,10 @@ function AppContent() {
 
   if (view === "albums") {
     return <Albums />;
+  }
+
+  if (view === "playlist-importer") {
+    return <PlaylistImporter />;
   }
 }
 

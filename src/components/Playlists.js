@@ -30,7 +30,19 @@ function Playlists() {
     store.dispatch(fetchPlaylists({ spotifyAccessToken: apiToken }));
   }, [apiToken, playlists]);
 
-  const button = selectedPlaylistId ? (
+  const showPlaylistImporter = (
+    <Button
+      variant="contained"
+      color="primary"
+      onClick={() => {
+        store.dispatch(setView({ view: "playlist-importer" }));
+      }}
+    >
+      Or… create a playlist from text
+    </Button>
+  );
+
+  const showPlaylistAsAlbums = selectedPlaylistId ? (
     <Button
       variant="contained"
       color="primary"
@@ -39,7 +51,7 @@ function Playlists() {
         store.dispatch(setView({ view: "albums" }));
       }}
     >
-      Show Albums
+      Show albums in selected playlist
     </Button>
   ) : null;
 
@@ -60,7 +72,8 @@ function Playlists() {
           </ListItem>
         ))}
       </List>
-      {button}
+      {showPlaylistAsAlbums}
+      <p>{showPlaylistImporter}</p>
     </>
   );
 }
