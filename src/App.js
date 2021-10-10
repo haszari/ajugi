@@ -18,6 +18,7 @@ import AuthoriseSpotify from "./components/AuthoriseSpotify.js";
 
 import Playlists from "./components/Playlists.js";
 import Albums from "./components/Albums.js";
+import CoverGrid from "./components/CoverGrid.js";
 
 import PlaylistImporter from "./components/PlaylistImporter.js";
 
@@ -57,6 +58,10 @@ function AppContent() {
 
   if (view === "albums") {
     return <Albums />;
+  }
+
+  if (view === "covergrid") {
+    return <CoverGrid />;
   }
 
   if (view === "playlist-importer") {

@@ -55,6 +55,19 @@ function Playlists() {
     </Button>
   ) : null;
 
+  const showPlaylistAsGrid = selectedPlaylistId ? (
+    <Button
+      variant="contained"
+      color="primary"
+      onClick={() => {
+        store.dispatch(setPlaylistId({ playlistId: selectedPlaylistId }));
+        store.dispatch(setView({ view: "covergrid" }));
+      }}
+    >
+      Show playlist as grid
+    </Button>
+  ) : null;
+
   return (
     <>
       <List className="primary">
@@ -73,6 +86,7 @@ function Playlists() {
         ))}
       </List>
       {showPlaylistAsAlbums}
+      {showPlaylistAsGrid}
       <p>{showPlaylistImporter}</p>
     </>
   );

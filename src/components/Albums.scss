@@ -2,6 +2,8 @@
   display: grid;
   grid-template-columns: repeat(auto-fill, 100px);
   grid-gap: 1em;
+  line-height: 0;
+  margin: 1em;
 
   .release {
     position: relative;
