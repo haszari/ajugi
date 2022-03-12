@@ -7,20 +7,18 @@ import { getApiToken } from "../store/app/selectors";
 import { baseUrl, spotifyFetch } from "../lib/spotify-api";
 
 const rawPlaylistItems = [
-  "Acid Police - Opening",
-  "Joe KORI - Low Ride ft. Hamishi",
-  "Shadowax - Nikolai Reptile",
-  "Yaleesa Hall - Zoe Price",
-  "Hassan Abou Alam - All Used Up",
-  "Borai & Denham Audio - Make Me",
-  "Overmono - BMW Track",
-  "Totally Enormous Extinct Dinosaurs - Sickly Child",
-  "Regal - Still Raving",
-  "FROST - Acid Dance ",
-  "Achterbahn D'Amour - Trance Me Up (Skudge remix)",
-  "Jeroen Search & Gotshell - Driekwart",
-  "Heiko Laux - Self",
-  "Extrawelt - Doch Doch",
+  "Junes - Shifting Sands (Central mix)",
+  "Scope Zone - Liquid Earth",
+  "Guy Contact - Body Groove",
+  "Moktar - Blue",
+  "Hame DJ - Zoot",
+  "Reptant - Liquid Acrobatics",
+  "Eden Burns - Hands Off My Beat",
+  "Eden Burns - Hand On The Chart",
+  "Nice Girl - Hot mm & Hmm's",
+  "Ambien Baby - El Kesh",
+  "DJ JM - Rainee",
+  "Juno Mamba - 1996 ft. ANTONMOND (Manami remix)",
 ];
 
 async function getMyUserId(spotifyAccessToken) {

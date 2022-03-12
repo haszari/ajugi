@@ -4,6 +4,8 @@
   grid-gap: 1em;
   line-height: 0;
   margin: 1em;
+  transform: rotate( -5deg );
+  position: relative;
 
   .release {
     position: relative;
@@ -63,4 +65,17 @@
       }
     }
   }
+}
+
+.CoverGrid-group {
+  position: relative;
+  margin: 5em;
+  width: 928px;
+  height: 928px;
+  border: 1px solid grey;
+}
+.mixer-logo {
+  position: absolute;
+  bottom: 0;
+  right: 0;; 
 }

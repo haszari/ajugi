@@ -42,6 +42,19 @@ function Playlists() {
     </Button>
   );
 
+  const showPlaylistAsSongs = selectedPlaylistId ? (
+    <Button
+      variant="contained"
+      color="primary"
+      onClick={() => {
+        store.dispatch(setPlaylistId({ playlistId: selectedPlaylistId }));
+        store.dispatch(setView({ view: "songs" }));
+      }}
+    >
+      Show songs
+    </Button>
+  ) : null;
+
   const showPlaylistAsAlbums = selectedPlaylistId ? (
     <Button
       variant="contained"
@@ -51,7 +64,7 @@ function Playlists() {
         store.dispatch(setView({ view: "albums" }));
       }}
     >
-      Show albums in selected playlist
+      Show albums
     </Button>
   ) : null;
 
@@ -60,11 +73,13 @@ function Playlists() {
       variant="contained"
       color="primary"
       onClick={() => {
+        // const hardcoded = '1rIcFdYOmF7wv6hvLtEIEM';
+        // store.dispatch(setPlaylistId({ playlistId: hardcoded }));
         store.dispatch(setPlaylistId({ playlistId: selectedPlaylistId }));
         store.dispatch(setView({ view: "covergrid" }));
       }}
     >
-      Show playlist as grid
+      Render grid + playlist
     </Button>
   ) : null;
 
@@ -87,6 +102,7 @@ function Playlists() {
       </List>
       {showPlaylistAsAlbums}
       {showPlaylistAsGrid}
+      {showPlaylistAsSongs}
       <p>{showPlaylistImporter}</p>
     </>
   );

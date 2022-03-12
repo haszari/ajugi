@@ -4,18 +4,18 @@ import { shuffle } from "lodash";
 
 import { useSelector } from "react-redux";
 
-import Button from "@material-ui/core/Button";
-
 import classnames from "classnames";
-
-import { playItem } from "../lib/spotify-api";
 
 import store from "../store/store.js";
 
-import { fetchSongs, setSelectedAlbumId } from "../store/albums";
+import NumberedPlaylist from "./NumberedPlaylist.js";
+import NumberedPlaylistMarkdown from "./NumberedPlaylistMarkdown.js";
+
+import { fetchSongs } from "../store/albums";
 import {
   getStatus,
   getAlbums,
+  getSongs,
   getSelectedAlbumId,
 } from "../store/albums/selectors";
 import { getApiToken } from "../store/app/selectors";
@@ -49,11 +49,12 @@ function Album({ id, albumSongs, isSelected }) {
   );
 }
 
-function Albums() {
+function RadioShowCoverGridAndPlaylist() {
   const status = useSelector(getStatus);
   const spotifyAccessToken = useSelector(getApiToken);
   const selectedAlbumId = useSelector(getSelectedAlbumId);
   let albums = useSelector(getAlbums);
+  let songs = useSelector(getSongs);
 
   // Start loading songs on mount.
   useEffect(() => {
@@ -77,15 +78,28 @@ function Albums() {
     />
   ));
 
-  cells.push( (
+  const emptyCell = (
     <div className="release ep">
-      <CBRMixerLogo />
       </div>
-  ) );
+  );
 
   const shuffled = shuffle( cells );
 
-  return <div className="Albums-container">{shuffled}</div>;
+  // add empty cells to start to make it balanced
+  if (cells.length === 13) {
+    shuffled.unshift(emptyCell);
+  }
+
+  return (
+    <>
+      <div className='CoverGrid-group'>
+        <CBRMixerLogo />
+        <div className="Albums-container">{shuffled}</div>
+      </div>
+      <NumberedPlaylist songs={songs} />
+      <NumberedPlaylistMarkdown songs={songs} />
+    </>
+  );
 }
 
-export default Albums;
+export default RadioShowCoverGridAndPlaylist;
