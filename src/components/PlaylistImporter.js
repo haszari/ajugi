@@ -7,20 +7,22 @@ import { getApiToken } from "../store/app/selectors";
 import { baseUrl, spotifyFetch } from "../lib/spotify-api";
 
 const rawPlaylistItems = [
-  "Acid Police - Opening",
-  "Joe KORI - Low Ride ft. Hamishi",
-  "Shadowax - Nikolai Reptile",
-  "Yaleesa Hall - Zoe Price",
-  "Hassan Abou Alam - All Used Up",
-  "Borai & Denham Audio - Make Me",
-  "Overmono - BMW Track",
-  "Totally Enormous Extinct Dinosaurs - Sickly Child",
-  "Regal - Still Raving",
-  "FROST - Acid Dance ",
-  "Achterbahn D'Amour - Trance Me Up (Skudge remix)",
-  "Jeroen Search & Gotshell - Driekwart",
-  "Heiko Laux - Self",
-  "Extrawelt - Doch Doch",
+  "Sonny Fodera & Bontan - Always You (Shiba San remix)",
+  "Guille Placencia - My Name Is",
+  "Popof - Silicone",
+  "Armand Van Helden - Summertime",
+  "Rhyze - Just How Sweet Is Your Love (Walker & Royce remix)",
+  "Eden Burns - Intro Manus",
+  "Paranoid London - Eating Glue (ft. Mutado Pintado)",
+  "Frankel & Harper - Hydraulic Temperature",
+  "Daniel Steinberg - Facelift",
+  "Tommy Trash - Slide (Ricky Rae's re-rub)",
+  "Tchami & Malaa - The Sermon",
+  "Lux Groove - Setup",
+  "Peggy Gou - I Go",
+  "Marie Davidson - Work It (Soulwax remix)",
+  "Robosonic - Worst Love",
+  "Qubiko - U R",
 ];
 
 async function getMyUserId(spotifyAccessToken) {

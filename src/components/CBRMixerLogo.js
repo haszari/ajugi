@@ -15,6 +15,7 @@ function MixerLogo( {
   const style = {
     padding: padding,
     transform: `rotate(${rotate}deg)`,
+    zIndex: 1,
   };
   const mixerSize = size - 2* padding;
 
