@@ -42,8 +42,8 @@ function Album({ id, albumSongs, isSelected }) {
 
   const coverComponent = ( <img src={coverImageUrl} alt="" /> );
 
-  return ( 
-    <CoverGridItem 
+  return (
+    <CoverGridItem
       coverComponent={ coverComponent }
       />
   );
