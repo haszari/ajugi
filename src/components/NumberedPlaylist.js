@@ -26,6 +26,8 @@ function SongList({ songs }) {
     // fontSize: '200%',
     backgroundColor: 'white',
 
+    // Add lots of padding so can get a square screenshot.
+    padding: '10em',
   };
 
   return (
