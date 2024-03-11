@@ -15,8 +15,13 @@ import { setApiToken } from "./store/app";
 import { getApiToken, getView } from "./store/app/selectors";
 
 import AuthoriseSpotify from "./components/AuthoriseSpotify.js";
+
 import Playlists from "./components/Playlists.js";
+import Songs from "./components/Songs.js";
 import Albums from "./components/Albums.js";
+import CoverGrid from "./components/CoverGrid.js";
+
+import PlaylistImporter from "./components/PlaylistImporter.js";
 
 import useUrlHashParams from "./lib/useUrlHashParams.js";
 
@@ -55,6 +60,20 @@ function AppContent() {
   if (view === "albums") {
     return <Albums />;
   }
+
+  if (view === "covergrid") {
+    return <CoverGrid />;
+  }
+
+  if (view === "songs") {
+    return <Songs />;
+  }
+
+  if (view === "playlist-importer") {
+    return <PlaylistImporter />;
+  }
+
+  return "No view mapped in AppContent component (App.js)";
 }
 
 // Top-level app component with theme, store provider etc.

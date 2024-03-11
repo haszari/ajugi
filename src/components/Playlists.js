@@ -30,7 +30,32 @@ function Playlists() {
     store.dispatch(fetchPlaylists({ spotifyAccessToken: apiToken }));
   }, [apiToken, playlists]);
 
-  const button = selectedPlaylistId ? (
+  const showPlaylistImporter = (
+    <Button
+      variant="contained"
+      color="primary"
+      onClick={() => {
+        store.dispatch(setView({ view: "playlist-importer" }));
+      }}
+    >
+      Or… create a playlist from text
+    </Button>
+  );
+
+  const showPlaylistAsSongs = selectedPlaylistId ? (
+    <Button
+      variant="contained"
+      color="primary"
+      onClick={() => {
+        store.dispatch(setPlaylistId({ playlistId: selectedPlaylistId }));
+        store.dispatch(setView({ view: "songs" }));
+      }}
+    >
+      Show songs
+    </Button>
+  ) : null;
+
+  const showPlaylistAsAlbums = selectedPlaylistId ? (
     <Button
       variant="contained"
       color="primary"
@@ -39,7 +64,22 @@ function Playlists() {
         store.dispatch(setView({ view: "albums" }));
       }}
     >
-      Show Albums
+      Show albums
+    </Button>
+  ) : null;
+
+  const showPlaylistAsGrid = selectedPlaylistId ? (
+    <Button
+      variant="contained"
+      color="primary"
+      onClick={() => {
+        // const hardcoded = '1rIcFdYOmF7wv6hvLtEIEM';
+        // store.dispatch(setPlaylistId({ playlistId: hardcoded }));
+        store.dispatch(setPlaylistId({ playlistId: selectedPlaylistId }));
+        store.dispatch(setView({ view: "covergrid" }));
+      }}
+    >
+      Render grid + playlist
     </Button>
   ) : null;
 
@@ -60,7 +100,10 @@ function Playlists() {
           </ListItem>
         ))}
       </List>
-      {button}
+      {showPlaylistAsAlbums}
+      {showPlaylistAsGrid}
+      {showPlaylistAsSongs}
+      <p>{showPlaylistImporter}</p>
     </>
   );
 }

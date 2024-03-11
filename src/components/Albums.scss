@@ -1,7 +1,11 @@
 .Albums-container {
   display: grid;
-  grid-template-columns: repeat(auto-fill, 100px);
+  grid-template-columns: repeat(auto-fill, 90px);
   grid-gap: 1em;
+  line-height: 0;
+  margin: 1em;
+  // transform: rotate( 2deg );
+  position: relative;
 
   .release {
     position: relative;
@@ -53,12 +57,27 @@
 
       img,
       .info {
-        width: calc(200px + 1em);
-        height: calc(200px + 1em);
+        width: calc(180px + 1em);
+        height: calc(180px + 1em);
       }
       .info {
-        left: calc(200px + 1em);
+        left: calc(180px + 1em);
       }
     }
   }
+}
+
+.CoverGrid-group {
+  position: relative;
+  margin: 1em;
+  margin-bottom: 5em;
+  width: 850px;
+  height: 850px;
+  // border: 1px solid grey;
+  // background-color: black;
+}
+.mixer-logo {
+  position: absolute;
+  bottom: -3px;
+  right: 5px;
 }

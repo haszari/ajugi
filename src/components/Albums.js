@@ -96,7 +96,7 @@ function Albums() {
       isSelected={id === selectedAlbumId}
     />
   ));
-
+  
   return <div className="Albums-container">{cells}</div>;
 }
 
