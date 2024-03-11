@@ -22,6 +22,8 @@ import { getApiToken } from "../store/app/selectors";
 
 import CBRMixerLogo from "./CBRMixerLogo";
 import "./Albums.scss";
+import "./CoverGrid.scss";
+
 
 function CoverGridItem({ coverComponent }) {
   return (

@@ -21,17 +21,17 @@ function SongList({ songs }) {
     );
   });
 
-  const style = {
-    // This is unnecessary, makes the text huge when pasting into Gmail
-    // fontSize: '200%',
-    backgroundColor: 'white',
+  // const style = {
+  //   // This is unnecessary, makes the text huge when pasting into Gmail
+  //   // fontSize: '200%',
+  //   backgroundColor: 'white',
 
-    // Add lots of padding so can get a square screenshot.
-    padding: '10em',
-  };
+  //   // Add lots of padding so can get a square screenshot.
+  //   padding: '10em',
+  // };
 
   return (
-    <ol style={ style }>
+    <ol className="SongList">
       {rows}
     </ol>
   );

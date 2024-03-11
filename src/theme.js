@@ -16,24 +16,24 @@ const theme = createMuiTheme({
       '"Segoe UI Emoji"',
       '"Segoe UI Symbol"',
     ].join(','),
-  }
-  // palette: {
-  //   primary: {
-  //     main: "#ff0022",
-  //   },
+  },
+  palette: {
+    // primary: {
+    //   main: "#ff4400",
+    // },
   //   secondary: {
   //     main: "#22ff00",
   //   },
   //   error: {
   //     main: orange.A400,
   //   },
-  //   background: {
-  //     default: "#cga",
-  //   },
+    background: {
+      default: "orange",
+    },
   //   action: {
   //     selected: "green",
   //   },
-  // },
+  },
 });
 
 export default theme;
