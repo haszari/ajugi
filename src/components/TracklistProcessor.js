@@ -87,6 +87,37 @@ const useStyles = makeStyles((theme) => ({
     opacity: 0.5,
     pointerEvents: 'none',
   },
+  playlistCanvas: {
+    marginBottom: theme.spacing(3),
+  },
+  canvasContainer: {
+    width: '1111px',
+    height: '1111px',
+    border: '2px solid #ddd',
+    borderRadius: theme.spacing(1),
+    backgroundColor: '#ffffff',
+    display: 'flex',
+    flexDirection: 'column',
+    overflow: 'hidden',
+    margin: '0 auto',
+    maxWidth: '100%', // Responsive fallback
+  },
+  canvasTracklistSection: {
+    flex: 1,
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: theme.spacing(4),
+  },
+  tracklistContent: {
+    width: '100%',
+    textAlign: 'left',
+  },
+  tracklistLine: {
+    marginBottom: theme.spacing(1),
+    fontSize: '1rem',
+    lineHeight: 1.5,
+  },
 }));
 
 function TrackResult({ result, index, onUpdateResult, apiToken }) {
@@ -126,7 +157,7 @@ function TrackResult({ result, index, onUpdateResult, apiToken }) {
         const artists = track.artists.map(a => a.name).join(' + ');
         return `**${artists}** – _${track.name}_`;
       } else if (result.isNewTrack) {
-        return '**Artist** – _Track Title_';
+        return '**Artist** – _Track title_';
       } else {
         return `**${result.originalText}** – _[NOT FOUND]_`;
       }
@@ -198,7 +229,7 @@ function TrackResult({ result, index, onUpdateResult, apiToken }) {
         const artists = track.artists.map(a => a.name).join(' + ');
         markdownText = `**${artists}** – _${track.name}_`;
       } else if (result.isNewTrack) {
-        markdownText = '**Artist** – _Track Title_';
+        markdownText = '**Artist** – _Track title_';
       } else {
         markdownText = `**${result.originalText}** – _[NOT FOUND]_`;
       }
@@ -442,7 +473,7 @@ function TrackResult({ result, index, onUpdateResult, apiToken }) {
                   </Typography>
                 ) : result.isNewTrack ? (
                   <Typography variant="body2" color="textSecondary">
-                    Click "Custom" or "Refine Search" to add track details
+                    Click "Custom" or "Refine search" to add track details
                   </Typography>
                 ) : (
                   <Typography variant="body2" color="error">
@@ -466,7 +497,7 @@ function TrackResult({ result, index, onUpdateResult, apiToken }) {
                         }
                       }}
                     >
-                      Refine Search
+                      Refine search
                     </Button>
                     <Button 
                       size="small" 
@@ -529,7 +560,7 @@ function TrackResult({ result, index, onUpdateResult, apiToken }) {
               // Custom track mode
               <>
                 <Typography variant="body2" gutterBottom>
-                  <strong>Custom Track:</strong>
+                  <strong>Custom track:</strong>
                 </Typography>
                 
                 <Grid container spacing={2}>
@@ -546,7 +577,7 @@ function TrackResult({ result, index, onUpdateResult, apiToken }) {
                   </Grid>
                   <Grid item xs={12} sm={6}>
                     <TextField
-                      label="Track Title"
+                      label="Track title"
                       size="small"
                       fullWidth
                       value={customTitle}
@@ -575,7 +606,7 @@ function TrackResult({ result, index, onUpdateResult, apiToken }) {
                     />
                     <label htmlFor={`cover-upload-${index}`}>
                       <Button variant="outlined" component="span" size="small" fullWidth>
-                        Upload Cover Art
+                        Upload cover art
                       </Button>
                     </label>
                   </Grid>
@@ -583,7 +614,7 @@ function TrackResult({ result, index, onUpdateResult, apiToken }) {
 
                 {customCoverImageUrl && (
                   <Box mt={2}>
-                    <Typography variant="body2" gutterBottom>Cover Preview:</Typography>
+                    <Typography variant="body2" gutterBottom>Cover preview:</Typography>
                     <img 
                       src={customCoverImageUrl} 
                       alt="Cover preview" 
@@ -603,7 +634,7 @@ function TrackResult({ result, index, onUpdateResult, apiToken }) {
                     onClick={handleSaveCustom}
                     disabled={!customArtist.trim() || !customTitle.trim()}
                   >
-                    Save Custom Track
+                    Save custom track
                   </Button>
                 </Box>
               </>
@@ -611,7 +642,7 @@ function TrackResult({ result, index, onUpdateResult, apiToken }) {
               // Spotify search mode
               <>
                 <Typography variant="body2" gutterBottom>
-                  <strong>Refine Search:</strong>
+                  <strong>Refine search:</strong>
                 </Typography>
             
             <Grid container spacing={2} alignItems="center">
@@ -677,7 +708,7 @@ function TrackResult({ result, index, onUpdateResult, apiToken }) {
 
             {searchResults.length > 0 && (
               <Box mt={2}>
-                <Typography variant="body2" gutterBottom>
+                                <Typography variant="body2" gutterBottom>
                   <strong>Select the correct track:</strong>
                 </Typography>
                 {searchResults.slice(0, 5).map((track, trackIndex) => (
@@ -726,7 +757,7 @@ function CoverArtGrid({ coverArtData }) {
   return (
     <div className={classes.coverGrid}>
       <Typography variant="h5" gutterBottom>
-        Cover Art Grid
+        Cover art grid
       </Typography>
       <Grid container spacing={2}>
         {coverArtData.map((cover, index) => (
@@ -740,6 +771,117 @@ function CoverArtGrid({ coverArtData }) {
           </Grid>
         ))}
       </Grid>
+    </div>
+  );
+}
+
+function PlaylistCanvas({ coverArtData, markdown }) {
+  const classes = useStyles();
+  const [fontSize, setFontSize] = React.useState(16); // Default font size in px
+  const [leftMargin, setLeftMargin] = React.useState(0); // Default left margin in em
+  
+  if (!markdown) {
+    return null;
+  }
+
+  // Parse markdown into structured list
+  const tracklistLines = markdown.split('\n').filter(line => line.trim());
+
+  const adjustLeftMargin = (delta) => {
+    setLeftMargin(prev => Math.max(0, Math.min(10, prev + delta))); // Clamp between 0 and 10em
+  };
+
+  return (
+    <div className={classes.playlistCanvas}>
+      {/* Controls */}
+      <Box display="flex" alignItems="center" gap={4} mb={2}>
+        {/* Font Size Control */}
+        <Box display="flex" alignItems="center" gap={1} minWidth={150}>
+          <Typography variant="body2" style={{ minWidth: 'fit-content' }}>
+            Font size:
+          </Typography>
+          <input
+            type="range"
+            min="12"
+            max="36"
+            value={fontSize}
+            onChange={(e) => setFontSize(parseInt(e.target.value))}
+            style={{ flex: 1 }}
+          />
+          <Typography variant="body2" style={{ minWidth: '30px' }}>
+            {fontSize}px
+          </Typography>
+        </Box>
+        
+        {/* Left Margin Control */}
+        <Box display="flex" alignItems="center" gap={1}>
+          <Typography variant="body2" style={{ minWidth: 'fit-content' }}>
+            Left margin:
+          </Typography>
+          <Button
+            size="small"
+            variant="outlined"
+            onClick={() => adjustLeftMargin(-0.5)}
+            style={{ minWidth: '30px', padding: '4px' }}
+          >
+            ←
+          </Button>
+          <Typography variant="body2" style={{ minWidth: '50px', textAlign: 'center' }}>
+            {leftMargin}em
+          </Typography>
+          <Button
+            size="small"
+            variant="outlined"
+            onClick={() => adjustLeftMargin(0.5)}
+            style={{ minWidth: '30px', padding: '4px' }}
+          >
+            →
+          </Button>
+        </Box>
+      </Box>
+      
+      <div className={classes.canvasContainer}>
+        {/* Tracklist Section */}
+        <div className={classes.canvasTracklistSection}>
+          <div 
+            className={classes.tracklistContent}
+            style={{ 
+              marginLeft: `${leftMargin}em`,
+              fontSize: `${fontSize}px`
+            }}
+          >
+            {tracklistLines.map((line, index) => {
+              // Parse markdown formatting for display
+              const renderLine = (text) => {
+                const parts = text.split(/(\*\*.*?\*\*|_.*?_|\[NZ\])/);
+                
+                return parts.map((part, idx) => {
+                  if (part.startsWith('**') && part.endsWith('**')) {
+                    return <strong key={idx}>{part.slice(2, -2)}</strong>;
+                  } else if (part.startsWith('_') && part.endsWith('_')) {
+                    return <em key={idx}>{part.slice(1, -1)}</em>;
+                  } else if (part === '[NZ]') {
+                    return <span key={idx} style={{ color: '#1976d2', fontWeight: 'bold' }}>{part}</span>;
+                  } else {
+                    return part;
+                  }
+                });
+              };
+              
+              return (
+                <Typography 
+                  key={index} 
+                  variant="body1" 
+                  className={classes.tracklistLine}
+                  style={{ fontSize: 'inherit' }} // Inherit from parent
+                >
+                  {renderLine(line)}
+                </Typography>
+              );
+            })}
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
@@ -759,10 +901,10 @@ function MarkdownOutput({ markdown }) {
     <div>
       <Box display="flex" justifyContent="space-between" alignItems="center" mb={1}>
         <Typography variant="h5">
-          Tracklist Markdown
+          Tracklist markdown
         </Typography>
         <Button variant="outlined" size="small" onClick={handleCopy}>
-          Copy to Clipboard
+          Copy to clipboard
         </Button>
       </Box>
       <Paper className={classes.markdownOutput}>
@@ -840,7 +982,7 @@ function TracklistProcessor() {
       <div className={classes.header}>
         <div>
           <Typography variant="h4" gutterBottom>
-            Tracklist to Cover Art & Markdown
+            Tracklist to cover art & markdown
           </Typography>
           <Chip 
             label="✓ Connected to Spotify" 
@@ -874,7 +1016,7 @@ function TracklistProcessor() {
         onClick={handleProcess}
         disabled={isProcessing || !tracklistText.trim()}
       >
-        {isProcessing ? 'Processing...' : 'Process Tracklist'}
+        {isProcessing ? 'Processing...' : 'Process tracklist'}
       </Button>
 
       {isProcessing && (
@@ -889,7 +1031,7 @@ function TracklistProcessor() {
       {results.length > 0 && !isProcessing && (
         <Box mb={3}>
           <Typography variant="h6" gutterBottom>
-            Search Results
+            Search results
           </Typography>
           <Box mb={2}>
             <Chip 
@@ -914,13 +1056,15 @@ function TracklistProcessor() {
               onClick={handleAddTrack}
               startIcon={<span>+</span>}
             >
-              Add Track
+              Add track
             </Button>
           </Box>
         </Box>
       )}
 
       <CoverArtGrid coverArtData={coverArtData} />
+      
+      <PlaylistCanvas coverArtData={coverArtData} markdown={markdown} />
       
       <MarkdownOutput markdown={markdown} />
     </div>
