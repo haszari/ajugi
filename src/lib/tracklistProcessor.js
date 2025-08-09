@@ -52,6 +52,81 @@ export async function searchForTrack(spotifyAccessToken, trackText) {
 }
 
 /**
+ * Search Spotify with specific artist and title fields
+ */
+export async function searchForTrackWithFields(spotifyAccessToken, artist, title) {
+  const url = new URL(baseUrl + "search");
+  url.searchParams.append("type", "track");
+  
+  // Use Spotify's field search syntax for more precise results
+  let query = '';
+  if (artist && artist.trim()) {
+    query += `artist:${artist.trim()} `;
+  }
+  if (title && title.trim()) {
+    query += `track:${title.trim()}`;
+  }
+  
+  url.searchParams.append("q", query.trim());
+  url.searchParams.append("limit", "10");
+
+  try {
+    const response = await spotifyFetch({ spotifyAccessToken, url });
+    const tracks = response?.tracks?.items || [];
+    
+    return {
+      originalText: `${artist} - ${title}`,
+      tracks: tracks,
+      bestMatch: tracks[0] || null,
+      found: tracks.length > 0,
+      searchQuery: query.trim()
+    };
+  } catch (error) {
+    console.error(`Error searching for track with fields: ${artist} - ${title}`, error);
+    return {
+      originalText: `${artist} - ${title}`,
+      tracks: [],
+      bestMatch: null,
+      found: false,
+      error: error.message,
+      searchQuery: query.trim()
+    };
+  }
+}
+
+/**
+ * Get track by Spotify ID
+ */
+export async function getTrackById(spotifyAccessToken, trackId) {
+  // Clean the track ID (remove spotify:track: prefix if present)
+  const cleanId = trackId.replace(/^spotify:track:/, '').replace(/^https:\/\/open\.spotify\.com\/track\//, '').split('?')[0];
+  
+  const url = new URL(baseUrl + `tracks/${cleanId}`);
+
+  try {
+    const track = await spotifyFetch({ spotifyAccessToken, url });
+    
+    return {
+      originalText: `Spotify ID: ${trackId}`,
+      tracks: [track],
+      bestMatch: track,
+      found: true,
+      fromSpotifyId: true
+    };
+  } catch (error) {
+    console.error(`Error getting track by ID: ${trackId}`, error);
+    return {
+      originalText: `Spotify ID: ${trackId}`,
+      tracks: [],
+      bestMatch: null,
+      found: false,
+      error: error.message,
+      fromSpotifyId: true
+    };
+  }
+}
+
+/**
  * Process an entire tracklist by searching for each track
  */
 export async function processTracklist(spotifyAccessToken, tracklistText) {
