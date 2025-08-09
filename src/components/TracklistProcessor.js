@@ -5,7 +5,7 @@ import {
   Button, 
   Typography, 
   Box, 
-  Card, 
+  Card,
   CardContent,
   Grid,
   LinearProgress,
@@ -45,10 +45,14 @@ const useStyles = makeStyles((theme) => ({
     marginBottom: theme.spacing(1),
   },
   foundTrack: {
-    backgroundColor: theme.palette.success.light,
+    backgroundColor: '#f0f0f0', // Light grey for all track cards
   },
   notFoundTrack: {
-    backgroundColor: theme.palette.error.light,
+    backgroundColor: '#f0f0f0', // Light grey for all track cards
+  },
+  hiddenTrack: {
+    opacity: 0.5,
+    backgroundColor: '#f0f0f0', // Same light grey but with reduced opacity
   },
   markdownOutput: {
     backgroundColor: theme.palette.grey[100],
@@ -62,6 +66,26 @@ const useStyles = makeStyles((theme) => ({
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'center',
+  },
+  trackTextContainer: {
+    position: 'relative',
+    flex: 1,
+    cursor: 'pointer',
+    padding: '8px',
+    borderRadius: '4px',
+    border: '1px solid transparent',
+    '&:hover': {
+      backgroundColor: '#f8f8f8',
+      border: '1px solid #e0e0e0',
+    }
+  },
+  editIcon: {
+    position: 'absolute',
+    top: '4px',
+    right: '4px',
+    fontSize: '14px',
+    opacity: 0.5,
+    pointerEvents: 'none',
   },
 }));
 
@@ -81,6 +105,112 @@ function TrackResult({ result, index, onUpdateResult, apiToken }) {
   const [customAlbum, setCustomAlbum] = useState('');
   const [customCoverImage, setCustomCoverImage] = useState(null);
   const [customCoverImageUrl, setCustomCoverImageUrl] = useState('');
+  
+  // Markdown editing state
+  const [isEditingMarkdown, setIsEditingMarkdown] = useState(false);
+  const [markdownText, setMarkdownText] = useState('');
+
+  // Initialize markdown text when result changes
+  React.useEffect(() => {
+    // Don't update if user is actively editing
+    if (isEditingMarkdown) {
+      return;
+    }
+    
+    const getDefaultMarkdownText = () => {
+      if (result.customTrack) {
+        const custom = result.customTrack;
+        return `**${custom.artistName || 'Unknown Artist'}** – _${custom.trackName || 'Unknown Track'}_`;
+      } else if (result.bestMatch) {
+        const track = result.bestMatch;
+        const artists = track.artists.map(a => a.name).join(' + ');
+        return `**${artists}** – _${track.name}_`;
+      } else if (result.isNewTrack) {
+        return '**Artist** – _Track Title_';
+      } else {
+        return `**${result.originalText}** – _[NOT FOUND]_`;
+      }
+    };
+
+    setMarkdownText(result.customMarkdown || getDefaultMarkdownText());
+  }, [result.customMarkdown, result.customTrack, result.bestMatch, result.originalText, result.isNewTrack, isEditingMarkdown]);
+
+  const handleStartMarkdownEdit = () => {
+    const defaultMarkdown = (() => {
+      if (result.customTrack) {
+        const custom = result.customTrack;
+        return `**${custom.artistName || 'Unknown Artist'}** – _${custom.trackName || 'Unknown Track'}_`;
+      } else if (result.bestMatch) {
+        const track = result.bestMatch;
+        const artists = track.artists.map(a => a.name).join(' + ');
+        return `**${artists}** – _${track.name}_`;
+      } else if (result.isNewTrack) {
+        return '**Artist** – _Track Title_';
+      } else {
+        return `**${result.originalText}** – _[NOT FOUND]_`;
+      }
+    })();
+    
+    setMarkdownText(result.customMarkdown || defaultMarkdown);
+    setIsEditingMarkdown(true);
+  };
+
+  const handleSaveMarkdown = () => {
+    const updatedResult = {
+      ...result,
+      customMarkdown: markdownText
+    };
+    onUpdateResult(index, updatedResult);
+    setIsEditingMarkdown(false);
+  };
+
+  // Function to render markdown as rich text
+  const renderMarkdownAsRich = (markdownStr) => {
+    if (!markdownStr) return null;
+    
+    // Simple markdown parsing for bold (**text**) and italic (_text_)
+    const parts = markdownStr.split(/(\*\*.*?\*\*|_.*?_)/);
+    
+    return parts.map((part, idx) => {
+      if (part.startsWith('**') && part.endsWith('**')) {
+        return <strong key={idx}>{part.slice(2, -2)}</strong>;
+      } else if (part.startsWith('_') && part.endsWith('_')) {
+        return <em key={idx}>{part.slice(1, -1)}</em>;
+      } else {
+        return part;
+      }
+    });
+  };
+
+  // Get the current markdown text to display
+  const getCurrentMarkdownText = () => {
+    let markdownText = '';
+    
+    if (result.customMarkdown) {
+      markdownText = result.customMarkdown;
+    } else {
+      // Generate default markdown
+      if (result.customTrack) {
+        const custom = result.customTrack;
+        markdownText = `**${custom.artistName || 'Unknown Artist'}** – _${custom.trackName || 'Unknown Track'}_`;
+      } else if (result.bestMatch) {
+        const track = result.bestMatch;
+        const artists = track.artists.map(a => a.name).join(' + ');
+        markdownText = `**${artists}** – _${track.name}_`;
+      } else if (result.isNewTrack) {
+        markdownText = '**Artist** – _Track Title_';
+      } else {
+        markdownText = `**${result.originalText}** – _[NOT FOUND]_`;
+      }
+    }
+    
+    // Append [NZ] if track is marked as NZ produced
+    if (result.isNZ) {
+      markdownText += ' [NZ]';
+    }
+    
+    return markdownText;
+  };
   
   // Initialize fields when entering edit mode
   const handleStartEdit = () => {
@@ -143,8 +273,20 @@ function TrackResult({ result, index, onUpdateResult, apiToken }) {
     }
   };
 
-  const handleDeleteTrack = () => {
-    onUpdateResult(index, null); // Pass null to indicate deletion
+  const handleToggleVisibility = () => {
+    const updatedResult = {
+      ...result,
+      hidden: !result.hidden
+    };
+    onUpdateResult(index, updatedResult);
+  };
+
+  const handleToggleNZ = () => {
+    const updatedResult = {
+      ...result,
+      isNZ: !result.isNZ
+    };
+    onUpdateResult(index, updatedResult);
   };
 
   const handleSaveCustom = () => {
@@ -166,7 +308,8 @@ function TrackResult({ result, index, onUpdateResult, apiToken }) {
       ...result,
       customTrack: customTrack,
       found: true,
-      bestMatch: null // Clear Spotify match since we're using custom
+      bestMatch: null, // Clear Spotify match since we're using custom
+      customMarkdown: null // Clear custom markdown so it regenerates from new track data
     };
 
     onUpdateResult(index, updatedResult);
@@ -212,68 +355,172 @@ function TrackResult({ result, index, onUpdateResult, apiToken }) {
       ...result,
       bestMatch: track,
       found: true,
-      tracks: [track, ...result.tracks]
+      tracks: [track, ...result.tracks],
+      customMarkdown: null // Clear custom markdown so it regenerates from new track data
     };
     onUpdateResult(index, updatedResult);
     setIsEditing(false);
   };
   
   return (
-    <Card className={`${classes.trackResult} ${result.found ? classes.foundTrack : classes.notFoundTrack}`}>
+    <Card className={`${classes.trackResult} ${
+      result.hidden ? classes.hiddenTrack : 
+      result.found ? classes.foundTrack : 
+      classes.notFoundTrack
+    }`}>
       <CardContent>
         <Box display="flex" justifyContent="space-between" alignItems="flex-start">
-          <div style={{ flex: 1 }}>
-            <Typography variant="body2">
-              <strong>{index + 1}.</strong> {result.isNewTrack ? '[New Track]' : result.originalText}
-            </Typography>
-            {result.customTrack ? (
-              <Typography variant="body2" color="primary">
-                ✓ Custom: {result.customTrack.artistName} - {result.customTrack.trackName}
-              </Typography>
-            ) : result.found ? (
-              <Typography variant="body2" color="textSecondary">
-                ✓ Spotify: {result.bestMatch.artists.map(a => a.name).join(', ')} - {result.bestMatch.name}
-              </Typography>
-            ) : result.isNewTrack ? (
-              <Typography variant="body2" color="textSecondary">
-                Click "Custom" or "Refine Search" to add track details
-              </Typography>
-            ) : (
-              <Typography variant="body2" color="error">
-                ✗ Not found
-              </Typography>
-            )}
-          </div>
-          
-          {!isEditing && (
-            <Box display="flex" gap={1} style={{ marginLeft: 16 }}>
-              <Button 
-                size="small" 
-                variant="outlined" 
-                onClick={handleStartEdit}
-              >
-                Refine Search
-              </Button>
-              <Button 
-                size="small" 
-                variant="outlined" 
-                color="secondary"
-                onClick={handleStartCustom}
-              >
-                Custom
-              </Button>
-              {result.isNewTrack && (
-                <Button 
-                  size="small" 
-                  variant="outlined" 
-                  color="secondary"
-                  onClick={handleDeleteTrack}
-                >
-                  Delete
-                </Button>
+          {!isEditing ? (
+            <>
+              <div style={{ flex: 1 }}>
+                {isEditingMarkdown ? (
+                  <Box display="flex" alignItems="flex-start" gap={1}>
+                    <TextField
+                      fullWidth
+                      multiline
+                      rows={2}
+                      value={markdownText}
+                      onChange={(e) => setMarkdownText(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' && !e.shiftKey) {
+                          e.preventDefault();
+                          handleSaveMarkdown();
+                        }
+                      }}
+                      label="Markdown format"
+                      variant="outlined"
+                      size="small"
+                      InputProps={{
+                        endAdornment: (
+                          <Button
+                            size="small"
+                            onClick={handleSaveMarkdown}
+                            style={{ 
+                              minWidth: 'auto', 
+                              padding: '4px',
+                              margin: 0,
+                              border: 'none',
+                              backgroundColor: 'transparent'
+                            }}
+                          >
+                            ✓
+                          </Button>
+                        )
+                      }}
+                    />
+                  </Box>
+                ) : (
+                  <Box 
+                    className={classes.trackTextContainer}
+                    onClick={!isEditing ? handleStartMarkdownEdit : undefined}
+                    style={{
+                      cursor: !isEditing ? 'pointer' : 'default',
+                      opacity: isEditing ? 0.7 : 1
+                    }}
+                  >
+                    <Typography 
+                      variant="body2" 
+                      style={{ 
+                        opacity: result.hidden ? 0.6 : 1,
+                        paddingRight: '20px' // Space for edit icon
+                      }}
+                      title="Click to edit markdown format"
+                    >
+                      <strong>{index + 1}.</strong> {renderMarkdownAsRich(getCurrentMarkdownText())}
+                      {result.hidden && <span style={{ marginLeft: 8, fontStyle: 'italic', color: '#666' }}>[Hidden]</span>}
+                    </Typography>
+                    <span className={classes.editIcon}>✏️</span>
+                  </Box>
+                )}
+                {result.customTrack ? (
+                  <Typography variant="body2" color="primary">
+                    ✓ Custom: {result.customTrack.artistName} - {result.customTrack.trackName}
+                  </Typography>
+                ) : result.found ? (
+                  <Typography variant="body2" color="textSecondary">
+                    ✓ Spotify: {result.bestMatch.artists.map(a => a.name).join(', ')} - {result.bestMatch.name}
+                  </Typography>
+                ) : result.isNewTrack ? (
+                  <Typography variant="body2" color="textSecondary">
+                    Click "Custom" or "Refine Search" to add track details
+                  </Typography>
+                ) : (
+                  <Typography variant="body2" color="error">
+                    ✗ Not found
+                  </Typography>
+                )}
+              </div>
+              
+              {!isEditingMarkdown && (
+                <Box display="flex" gap={3} alignItems="flex-start" style={{ marginLeft: 16 }}>
+                  {/* Search Actions Column */}
+                  <Box display="flex" flexDirection="column" gap={1}>
+                    <Button 
+                      size="small" 
+                      variant="text"
+                      onClick={handleStartEdit}
+                      style={{ 
+                        minWidth: 120,
+                        '&:hover': {
+                          backgroundColor: '#e0e0e0'
+                        }
+                      }}
+                    >
+                      Refine Search
+                    </Button>
+                    <Button 
+                      size="small" 
+                      variant="text"
+                      color="secondary"
+                      onClick={handleStartCustom}
+                      style={{ 
+                        minWidth: 120,
+                        '&:hover': {
+                          backgroundColor: '#e0e0e0'
+                        }
+                      }}
+                    >
+                      Custom
+                    </Button>
+                  </Box>
+                  
+                  {/* Visibility Toggle Column */}
+                  <Box display="flex" flexDirection="column" gap={1}>
+                    <Button
+                      size="small"
+                      variant="text"
+                      color={result.hidden ? "default" : "primary"}
+                      onClick={handleToggleVisibility}
+                      style={{ 
+                        minWidth: 80,
+                        '&:hover': {
+                          backgroundColor: '#e0e0e0'
+                        }
+                      }}
+                    >
+                      {result.hidden ? 'Show' : 'Hide'}
+                    </Button>
+                    <Button
+                      size="small"
+                      variant={result.isNZ ? "contained" : "text"}
+                      color="primary"
+                      onClick={handleToggleNZ}
+                      style={{ 
+                        minWidth: 80,
+                        backgroundColor: result.isNZ ? '#1976d2' : 'transparent',
+                        color: result.isNZ ? 'white' : 'inherit',
+                        '&:hover': {
+                          backgroundColor: result.isNZ ? '#1565c0' : '#e0e0e0'
+                        }
+                      }}
+                    >
+                      NZ
+                    </Button>
+                  </Box>
+                </Box>
               )}
-            </Box>
-          )}
+            </>
+          ) : null}
         </Box>
 
         {isEditing && (
@@ -537,15 +784,7 @@ function TracklistProcessor() {
 
   const handleUpdateResult = (index, updatedResult) => {
     const newResults = [...results];
-    
-    if (updatedResult === null) {
-      // Delete track
-      newResults.splice(index, 1);
-    } else {
-      // Update track
-      newResults[index] = updatedResult;
-    }
-    
+    newResults[index] = updatedResult;
     setResults(newResults);
     
     // Regenerate outputs with updated results

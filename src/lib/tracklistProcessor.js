@@ -149,7 +149,7 @@ export async function processTracklist(spotifyAccessToken, tracklistText) {
  */
 export function generateCoverArtData(processedTracks) {
   return processedTracks
-    .filter(result => result.bestMatch || result.customTrack)
+    .filter(result => !result.hidden && (result.bestMatch || result.customTrack))
     .map(result => {
       // Handle custom tracks
       if (result.customTrack) {
@@ -185,23 +185,40 @@ export function generateCoverArtData(processedTracks) {
  */
 export function generateMarkdownTracklist(processedTracks) {
   let markdown = '';
+  let trackNumber = 1;
   
-  processedTracks.forEach((result, index) => {
-    const trackNumber = index + 1;
+  processedTracks.forEach((result) => {
+    // Skip hidden tracks
+    if (result.hidden) {
+      return;
+    }
     
-    if (result.customTrack) {
+    let trackLine = '';
+    
+    // Use custom markdown if available
+    if (result.customMarkdown) {
+      trackLine = `${trackNumber}. ${result.customMarkdown}`;
+    } else if (result.customTrack) {
       // Custom track
       const custom = result.customTrack;
-      markdown += `${trackNumber}. **${custom.artistName || 'Unknown Artist'}** – _${custom.trackName || 'Unknown Track'}_\n`;
+      trackLine = `${trackNumber}. **${custom.artistName || 'Unknown Artist'}** – _${custom.trackName || 'Unknown Track'}_`;
     } else if (result.bestMatch) {
       // Spotify track
       const track = result.bestMatch;
       const artists = track.artists.map(a => a.name).join(' + ');
-      markdown += `${trackNumber}. **${artists}** – _${track.name}_\n`;
+      trackLine = `${trackNumber}. **${artists}** – _${track.name}_`;
     } else {
       // Track not found - include original text
-      markdown += `${trackNumber}. **${result.originalText}** – _[NOT FOUND]_\n`;
+      trackLine = `${trackNumber}. **${result.originalText}** – _[NOT FOUND]_`;
     }
+    
+    // Append [NZ] if track is marked as NZ produced
+    if (result.isNZ) {
+      trackLine += ' [NZ]';
+    }
+    
+    markdown += trackLine + '\n';
+    trackNumber++;
   });
   
   return markdown;
