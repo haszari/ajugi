@@ -67,12 +67,20 @@ const useStyles = makeStyles((theme) => ({
 
 function TrackResult({ result, index, onUpdateResult, apiToken }) {
   const classes = useStyles();
-  const [isEditing, setIsEditing] = useState(false);
+  const [isEditing, setIsEditing] = useState(result.isNewTrack || false);
+  const [isCustomMode, setIsCustomMode] = useState(false);
   const [isSearching, setIsSearching] = useState(false);
   const [artistField, setArtistField] = useState('');
   const [titleField, setTitleField] = useState('');
   const [spotifyIdField, setSpotifyIdField] = useState('');
   const [searchResults, setSearchResults] = useState([]);
+  
+  // Custom track fields
+  const [customArtist, setCustomArtist] = useState('');
+  const [customTitle, setCustomTitle] = useState('');
+  const [customAlbum, setCustomAlbum] = useState('');
+  const [customCoverImage, setCustomCoverImage] = useState(null);
+  const [customCoverImageUrl, setCustomCoverImageUrl] = useState('');
   
   // Initialize fields when entering edit mode
   const handleStartEdit = () => {
@@ -82,19 +90,88 @@ function TrackResult({ result, index, onUpdateResult, apiToken }) {
     if (dashIndex > 0) {
       setArtistField(text.substring(0, dashIndex).trim());
       setTitleField(text.substring(dashIndex + 3).trim());
+      setCustomArtist(text.substring(0, dashIndex).trim());
+      setCustomTitle(text.substring(dashIndex + 3).trim());
     } else {
       // If no dash, put everything in the title field
       setArtistField('');
       setTitleField(text.trim());
+      setCustomArtist('');
+      setCustomTitle(text.trim());
     }
     setSpotifyIdField('');
     setSearchResults([]);
+    setCustomAlbum('');
+    setCustomCoverImage(null);
+    setCustomCoverImageUrl('');
+    setIsCustomMode(false);
+    setIsEditing(true);
+  };
+
+  const handleStartCustom = () => {
+    // Initialize custom fields from original text
+    const text = result.originalText;
+    const dashIndex = text.indexOf(' - ');
+    if (dashIndex > 0) {
+      setCustomArtist(text.substring(0, dashIndex).trim());
+      setCustomTitle(text.substring(dashIndex + 3).trim());
+    } else {
+      setCustomArtist('');
+      setCustomTitle(text.trim());
+    }
+    setCustomAlbum('');
+    setCustomCoverImage(null);
+    setCustomCoverImageUrl('');
+    setIsCustomMode(true);
     setIsEditing(true);
   };
 
   const handleCancelEdit = () => {
     setIsEditing(false);
+    setIsCustomMode(false);
     setSearchResults([]);
+    setCustomCoverImageUrl('');
+  };
+
+  const handleImageUpload = (event) => {
+    const file = event.target.files[0];
+    if (file) {
+      setCustomCoverImage(file);
+      // Create a local URL for preview
+      const imageUrl = URL.createObjectURL(file);
+      setCustomCoverImageUrl(imageUrl);
+    }
+  };
+
+  const handleDeleteTrack = () => {
+    onUpdateResult(index, null); // Pass null to indicate deletion
+  };
+
+  const handleSaveCustom = () => {
+    if (!customArtist.trim() || !customTitle.trim()) {
+      alert('Please provide both artist and title for the custom track.');
+      return;
+    }
+
+    // Create custom track result
+    const customTrack = {
+      artistName: customArtist.trim(),
+      trackName: customTitle.trim(),
+      albumName: customAlbum.trim() || 'Single',
+      coverImageUrl: customCoverImageUrl,
+      coverImageFile: customCoverImage
+    };
+
+    const updatedResult = {
+      ...result,
+      customTrack: customTrack,
+      found: true,
+      bestMatch: null // Clear Spotify match since we're using custom
+    };
+
+    onUpdateResult(index, updatedResult);
+    setIsEditing(false);
+    setIsCustomMode(false);
   };
 
   const handleSearchWithFields = async () => {
@@ -147,11 +224,19 @@ function TrackResult({ result, index, onUpdateResult, apiToken }) {
         <Box display="flex" justifyContent="space-between" alignItems="flex-start">
           <div style={{ flex: 1 }}>
             <Typography variant="body2">
-              <strong>{index + 1}.</strong> {result.originalText}
+              <strong>{index + 1}.</strong> {result.isNewTrack ? '[New Track]' : result.originalText}
             </Typography>
-            {result.found ? (
+            {result.customTrack ? (
+              <Typography variant="body2" color="primary">
+                ✓ Custom: {result.customTrack.artistName} - {result.customTrack.trackName}
+              </Typography>
+            ) : result.found ? (
               <Typography variant="body2" color="textSecondary">
-                ✓ Found: {result.bestMatch.artists.map(a => a.name).join(', ')} - {result.bestMatch.name}
+                ✓ Spotify: {result.bestMatch.artists.map(a => a.name).join(', ')} - {result.bestMatch.name}
+              </Typography>
+            ) : result.isNewTrack ? (
+              <Typography variant="body2" color="textSecondary">
+                Click "Custom" or "Refine Search" to add track details
               </Typography>
             ) : (
               <Typography variant="body2" color="error">
@@ -161,22 +246,126 @@ function TrackResult({ result, index, onUpdateResult, apiToken }) {
           </div>
           
           {!isEditing && (
-            <Button 
-              size="small" 
-              variant="outlined" 
-              onClick={handleStartEdit}
-              style={{ marginLeft: 16 }}
-            >
-              Refine Search
-            </Button>
+            <Box display="flex" gap={1} style={{ marginLeft: 16 }}>
+              <Button 
+                size="small" 
+                variant="outlined" 
+                onClick={handleStartEdit}
+              >
+                Refine Search
+              </Button>
+              <Button 
+                size="small" 
+                variant="outlined" 
+                color="secondary"
+                onClick={handleStartCustom}
+              >
+                Custom
+              </Button>
+              {result.isNewTrack && (
+                <Button 
+                  size="small" 
+                  variant="outlined" 
+                  color="secondary"
+                  onClick={handleDeleteTrack}
+                >
+                  Delete
+                </Button>
+              )}
+            </Box>
           )}
         </Box>
 
         {isEditing && (
           <Box mt={2}>
-            <Typography variant="body2" gutterBottom>
-              <strong>Refine Search:</strong>
-            </Typography>
+            {isCustomMode ? (
+              // Custom track mode
+              <>
+                <Typography variant="body2" gutterBottom>
+                  <strong>Custom Track:</strong>
+                </Typography>
+                
+                <Grid container spacing={2}>
+                  <Grid item xs={12} sm={6}>
+                    <TextField
+                      label="Artist"
+                      size="small"
+                      fullWidth
+                      value={customArtist}
+                      onChange={(e) => setCustomArtist(e.target.value)}
+                      variant="outlined"
+                      required
+                    />
+                  </Grid>
+                  <Grid item xs={12} sm={6}>
+                    <TextField
+                      label="Track Title"
+                      size="small"
+                      fullWidth
+                      value={customTitle}
+                      onChange={(e) => setCustomTitle(e.target.value)}
+                      variant="outlined"
+                      required
+                    />
+                  </Grid>
+                  <Grid item xs={12} sm={6}>
+                    <TextField
+                      label="Album (optional)"
+                      size="small"
+                      fullWidth
+                      value={customAlbum}
+                      onChange={(e) => setCustomAlbum(e.target.value)}
+                      variant="outlined"
+                    />
+                  </Grid>
+                  <Grid item xs={12} sm={6}>
+                    <input
+                      accept="image/*"
+                      style={{ display: 'none' }}
+                      id={`cover-upload-${index}`}
+                      type="file"
+                      onChange={handleImageUpload}
+                    />
+                    <label htmlFor={`cover-upload-${index}`}>
+                      <Button variant="outlined" component="span" size="small" fullWidth>
+                        Upload Cover Art
+                      </Button>
+                    </label>
+                  </Grid>
+                </Grid>
+
+                {customCoverImageUrl && (
+                  <Box mt={2}>
+                    <Typography variant="body2" gutterBottom>Cover Preview:</Typography>
+                    <img 
+                      src={customCoverImageUrl} 
+                      alt="Cover preview" 
+                      style={{ maxWidth: 100, maxHeight: 100, borderRadius: 4 }}
+                    />
+                  </Box>
+                )}
+
+                <Box mt={2} display="flex" justifyContent="space-between">
+                  <Button size="small" onClick={handleCancelEdit}>
+                    Cancel
+                  </Button>
+                  <Button 
+                    size="small" 
+                    variant="contained" 
+                    color="primary"
+                    onClick={handleSaveCustom}
+                    disabled={!customArtist.trim() || !customTitle.trim()}
+                  >
+                    Save Custom Track
+                  </Button>
+                </Box>
+              </>
+            ) : (
+              // Spotify search mode
+              <>
+                <Typography variant="body2" gutterBottom>
+                  <strong>Refine Search:</strong>
+                </Typography>
             
             <Grid container spacing={2} alignItems="center">
               <Grid item xs={12} sm={4}>
@@ -271,6 +460,8 @@ function TrackResult({ result, index, onUpdateResult, apiToken }) {
                 Cancel
               </Button>
             </Box>
+              </>
+            )}
           </Box>
         )}
       </CardContent>
@@ -346,7 +537,15 @@ function TracklistProcessor() {
 
   const handleUpdateResult = (index, updatedResult) => {
     const newResults = [...results];
-    newResults[index] = updatedResult;
+    
+    if (updatedResult === null) {
+      // Delete track
+      newResults.splice(index, 1);
+    } else {
+      // Update track
+      newResults[index] = updatedResult;
+    }
+    
     setResults(newResults);
     
     // Regenerate outputs with updated results
@@ -355,6 +554,20 @@ function TracklistProcessor() {
     
     const markdownOutput = generateMarkdownTracklist(newResults);
     setMarkdown(markdownOutput);
+  };
+
+  const handleAddTrack = () => {
+    // Add a new empty track result
+    const newTrack = {
+      originalText: `New Track ${results.length + 1}`,
+      tracks: [],
+      bestMatch: null,
+      found: false,
+      isNewTrack: true
+    };
+    
+    const newResults = [...results, newTrack];
+    setResults(newResults);
   };
 
   const handleProcess = async () => {
@@ -454,6 +667,17 @@ function TracklistProcessor() {
               apiToken={apiToken}
             />
           ))}
+          
+          <Box mt={2} display="flex" justifyContent="center">
+            <Button
+              variant="outlined"
+              color="primary"
+              onClick={handleAddTrack}
+              startIcon={<span>+</span>}
+            >
+              Add Track
+            </Button>
+          </Box>
         </Box>
       )}
 

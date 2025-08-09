@@ -149,8 +149,22 @@ export async function processTracklist(spotifyAccessToken, tracklistText) {
  */
 export function generateCoverArtData(processedTracks) {
   return processedTracks
-    .filter(result => result.bestMatch)
+    .filter(result => result.bestMatch || result.customTrack)
     .map(result => {
+      // Handle custom tracks
+      if (result.customTrack) {
+        return {
+          albumId: `custom-${Date.now()}-${Math.random()}`,
+          albumName: result.customTrack.albumName || 'Custom Track',
+          artistName: result.customTrack.artistName || 'Unknown Artist',
+          coverImageUrl: result.customTrack.coverImageUrl,
+          trackName: result.customTrack.trackName || 'Unknown Track',
+          originalText: result.originalText,
+          isCustom: true
+        };
+      }
+      
+      // Handle Spotify tracks
       const track = result.bestMatch;
       const album = track.album;
       
@@ -160,7 +174,8 @@ export function generateCoverArtData(processedTracks) {
         artistName: track.artists.map(a => a.name).join(', '),
         coverImageUrl: album.images[0]?.url,
         trackName: track.name,
-        originalText: result.originalText
+        originalText: result.originalText,
+        isCustom: false
       };
     });
 }
@@ -174,7 +189,12 @@ export function generateMarkdownTracklist(processedTracks) {
   processedTracks.forEach((result, index) => {
     const trackNumber = index + 1;
     
-    if (result.bestMatch) {
+    if (result.customTrack) {
+      // Custom track
+      const custom = result.customTrack;
+      markdown += `${trackNumber}. **${custom.artistName || 'Unknown Artist'}** – _${custom.trackName || 'Unknown Track'}_\n`;
+    } else if (result.bestMatch) {
+      // Spotify track
       const track = result.bestMatch;
       const artists = track.artists.map(a => a.name).join(' + ');
       markdown += `${trackNumber}. **${artists}** – _${track.name}_\n`;
