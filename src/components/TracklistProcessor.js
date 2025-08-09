@@ -93,7 +93,6 @@ const useStyles = makeStyles((theme) => ({
   canvasContainer: {
     width: '1111px',
     height: '1111px',
-    border: '2px solid #ddd',
     borderRadius: theme.spacing(1),
     backgroundColor: '#ffffff',
     display: 'flex',
@@ -117,6 +116,21 @@ const useStyles = makeStyles((theme) => ({
     marginBottom: theme.spacing(1),
     fontSize: '1rem',
     lineHeight: 1.5,
+  },
+  colorPickerFooter: {
+    position: 'fixed',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    backgroundColor: 'rgba(255, 255, 255, 0.95)',
+    backdropFilter: 'blur(10px)',
+    borderTop: '1px solid #e0e0e0',
+    padding: theme.spacing(2),
+    zIndex: 1000,
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    gap: theme.spacing(3),
   },
 }));
 
@@ -775,7 +789,7 @@ function CoverArtGrid({ coverArtData }) {
   );
 }
 
-function PlaylistCanvas({ coverArtData, markdown }) {
+function PlaylistCanvas({ coverArtData, markdown, backgroundColor, textColor }) {
   const classes = useStyles();
   const [fontSize, setFontSize] = React.useState(16); // Default font size in px
   const [leftMargin, setLeftMargin] = React.useState(0); // Default left margin in em
@@ -840,14 +854,15 @@ function PlaylistCanvas({ coverArtData, markdown }) {
         </Box>
       </Box>
       
-      <div className={classes.canvasContainer}>
+      <div className={classes.canvasContainer} style={{ backgroundColor }}>
         {/* Tracklist Section */}
         <div className={classes.canvasTracklistSection}>
           <div 
             className={classes.tracklistContent}
             style={{ 
               marginLeft: `${leftMargin}em`,
-              fontSize: `${fontSize}px`
+              fontSize: `${fontSize}px`,
+              color: textColor
             }}
           >
             {tracklistLines.map((line, index) => {
@@ -863,7 +878,7 @@ function PlaylistCanvas({ coverArtData, markdown }) {
                   } else if (part === '[NZ]') {
                     return <span key={idx} style={{ color: '#1976d2', fontWeight: 'bold' }}>{part}</span>;
                   } else {
-                    return part;
+                    return <span key={idx} style={{ color: 'inherit' }}>{part}</span>;
                   }
                 });
               };
@@ -882,6 +897,76 @@ function PlaylistCanvas({ coverArtData, markdown }) {
           </div>
         </div>
       </div>
+    </div>
+  );
+}
+
+function ColorPickerFooter({ backgroundColor, setBackgroundColor, textColor, setTextColor }) {
+  const classes = useStyles();
+  
+  const pickColorLocal = async (setColor) => {
+    if ('EyeDropper' in window) {
+      try {
+        const eyeDropper = new window.EyeDropper();
+        const result = await eyeDropper.open();
+        setColor(result.sRGBHex);
+      } catch (error) {
+        console.log('User cancelled color picker or error occurred:', error);
+      }
+    } else {
+      alert('Color picker is not supported in this browser. Please use Chrome or Edge.');
+    }
+  };
+
+  return (
+    <div className={classes.colorPickerFooter}>
+      <Box display="flex" alignItems="center" gap={3}>
+        {/* Background Color */}
+        <Box display="flex" alignItems="center" gap={1}>
+          <Typography variant="body2" style={{ minWidth: 'fit-content' }}>
+            Page background:
+          </Typography>
+          <Button
+            size="small"
+            variant="outlined"
+            onClick={() => pickColorLocal(setBackgroundColor)}
+            style={{ 
+              minWidth: '40px', 
+              padding: '4px',
+              backgroundColor: backgroundColor,
+              border: `2px solid ${backgroundColor === '#ffffff' ? '#ccc' : backgroundColor}`
+            }}
+            title="Click to pick background color from page"
+          >
+            🎨
+          </Button>
+        </Box>
+        
+        {/* Text Color */}
+        <Box display="flex" alignItems="center" gap={1}>
+          <Typography variant="body2" style={{ minWidth: 'fit-content' }}>
+            Text colour:
+          </Typography>
+          <Button
+            size="small"
+            variant="outlined"
+            onClick={() => pickColorLocal(setTextColor)}
+            style={{ 
+              minWidth: '40px', 
+              padding: '4px',
+              backgroundColor: textColor,
+              border: `2px solid ${textColor === '#000000' ? '#ccc' : textColor}`
+            }}
+            title="Click to pick text color from page"
+          >
+            🎨
+          </Button>
+        </Box>
+        
+        <Typography variant="body2" style={{ color: '#666', fontStyle: 'italic' }}>
+          Pick colors from anywhere on the page
+        </Typography>
+      </Box>
     </div>
   );
 }
@@ -923,6 +1008,22 @@ function TracklistProcessor() {
   const [results, setResults] = useState([]);
   const [coverArtData, setCoverArtData] = useState([]);
   const [markdown, setMarkdown] = useState('');
+  const [backgroundColor, setBackgroundColor] = useState('#ffffff'); // Default background color
+  const [textColor, setTextColor] = useState('#000000'); // Default text color
+
+  const pickColor = async (setColor) => {
+    if ('EyeDropper' in window) {
+      try {
+        const eyeDropper = new window.EyeDropper();
+        const result = await eyeDropper.open();
+        setColor(result.sRGBHex);
+      } catch (error) {
+        console.log('User cancelled color picker or error occurred:', error);
+      }
+    } else {
+      alert('Color picker is not supported in this browser. Please use Chrome or Edge.');
+    }
+  };
 
   const handleUpdateResult = (index, updatedResult) => {
     const newResults = [...results];
@@ -978,7 +1079,7 @@ function TracklistProcessor() {
   const totalCount = results.length;
 
   return (
-    <div className={classes.container}>
+    <div className={classes.container} style={{ backgroundColor, minHeight: '100vh', paddingBottom: '80px' }}>
       <div className={classes.header}>
         <div>
           <Typography variant="h4" gutterBottom>
@@ -1064,9 +1165,17 @@ function TracklistProcessor() {
 
       <CoverArtGrid coverArtData={coverArtData} />
       
-      <PlaylistCanvas coverArtData={coverArtData} markdown={markdown} />
+      <PlaylistCanvas coverArtData={coverArtData} markdown={markdown} backgroundColor={backgroundColor} textColor={textColor} />
       
       <MarkdownOutput markdown={markdown} />
+      
+      {/* Sticky Color Picker Footer */}
+      <ColorPickerFooter 
+        backgroundColor={backgroundColor} 
+        setBackgroundColor={setBackgroundColor}
+        textColor={textColor}
+        setTextColor={setTextColor}
+      />
     </div>
   );
 }
