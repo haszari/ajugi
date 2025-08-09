@@ -16,12 +16,12 @@ import { getApiToken, getView } from "./store/app/selectors";
 
 import AuthoriseSpotify from "./components/AuthoriseSpotify.js";
 
-import Playlists from "./components/Playlists.js";
 import Songs from "./components/Songs.js";
 import Albums from "./components/Albums.js";
 import CoverGrid from "./components/CoverGrid.js";
 
 import PlaylistImporter from "./components/PlaylistImporter.js";
+import TracklistProcessor from "./components/TracklistProcessor.js";
 
 import useUrlHashParams from "./lib/useUrlHashParams.js";
 
@@ -53,8 +53,9 @@ function AppContent() {
     return <AuthoriseSpotify />;
   }
 
-  if (view === "playlists") {
-    return <Playlists />;
+  // Default to the new tracklist processor as the main flow
+  if (!view || view === "playlists" || view === "tracklist-processor") {
+    return <TracklistProcessor />;
   }
 
   if (view === "albums") {

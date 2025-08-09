@@ -28,7 +28,7 @@ const theme = createMuiTheme({
   //     main: orange.A400,
   //   },
     background: {
-      default: "orange",
+      default: "#f2f1f3",
     },
   //   action: {
   //     selected: "green",

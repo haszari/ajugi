@@ -4,7 +4,7 @@ const slice = createSlice({
   name: "spotifyClient",
   initialState: {
     apiToken: "",
-    view: "playlists",
+    view: "tracklist-processor",
   },
   reducers: {
     setApiToken(state, action) {
