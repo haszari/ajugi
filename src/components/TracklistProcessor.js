@@ -40,6 +40,10 @@ const useStyles = makeStyles((theme) => ({
     width: '100%',
     height: 'auto',
     borderRadius: theme.spacing(1),
+    display: 'block',
+  },
+  coverGridItem: {
+    aspectRatio: '1 / 1', // Force square aspect ratio
   },
   trackResult: {
     marginBottom: theme.spacing(1),
@@ -761,7 +765,7 @@ function TrackResult({ result, index, onUpdateResult, apiToken }) {
   );
 }
 
-function CoverArtGrid({ coverArtData }) {
+function CoverArtGrid({ coverArtData, textColor }) {
   const classes = useStyles();
   
   if (coverArtData.length === 0) {
@@ -769,13 +773,10 @@ function CoverArtGrid({ coverArtData }) {
   }
 
   return (
-    <div className={classes.coverGrid}>
-      <Typography variant="h5" gutterBottom>
-        Cover art grid
-      </Typography>
+    <div className={classes.coverGrid} style={{ marginTop: '2em' }}>
       <Grid container spacing={2}>
         {coverArtData.map((cover, index) => (
-          <Grid item xs={6} sm={4} md={3} lg={2} key={index}>
+          <Grid item xs={3} sm={3} md={3} lg={3} key={index} className={classes.coverGridItem}>
             <img 
               src={cover.coverImageUrl} 
               alt={`${cover.artistName} - ${cover.albumName}`}
@@ -806,14 +807,58 @@ function PlaylistCanvas({ coverArtData, markdown, backgroundColor, textColor }) 
   };
 
   return (
-    <div className={classes.playlistCanvas}>
+    <div className={classes.playlistCanvas} style={{ marginTop: '2em' }}>
       {/* Controls */}
-      <Box display="flex" alignItems="center" gap={4} mb={2}>
+      <Box 
+        display="flex" 
+        justifyContent="space-between"
+        alignItems="center" 
+        mb={2}
+        style={{ 
+          backgroundColor: backgroundColor,
+          color: textColor,
+          padding: '12px',
+          borderRadius: '8px',
+          border: `1px solid ${textColor}40` // 25% opacity border
+        }}
+      >
+        {/* Left Margin Control */}
+        <Box display="flex" alignItems="center" gap={1}>
+          <Button
+            size="small"
+            variant="outlined"
+            onClick={() => adjustLeftMargin(-0.5)}
+            style={{ 
+              minWidth: '30px', 
+              padding: '4px',
+              color: textColor,
+              borderColor: textColor,
+              backgroundColor: 'transparent'
+            }}
+          >
+            ←
+          </Button>
+          <Typography variant="body2" style={{ minWidth: '50px', textAlign: 'center', color: textColor }}>
+            {leftMargin}em
+          </Typography>
+          <Button
+            size="small"
+            variant="outlined"
+            onClick={() => adjustLeftMargin(0.5)}
+            style={{ 
+              minWidth: '30px', 
+              padding: '4px',
+              color: textColor,
+              borderColor: textColor,
+              backgroundColor: 'transparent'
+            }}
+          >
+            →
+          </Button>
+        </Box>
+        
         {/* Font Size Control */}
         <Box display="flex" alignItems="center" gap={1} minWidth={150}>
-          <Typography variant="body2" style={{ minWidth: 'fit-content' }}>
-            Font size:
-          </Typography>
           <input
             type="range"
             min="12"
@@ -822,35 +867,9 @@ function PlaylistCanvas({ coverArtData, markdown, backgroundColor, textColor }) 
             onChange={(e) => setFontSize(parseInt(e.target.value))}
             style={{ flex: 1 }}
           />
-          <Typography variant="body2" style={{ minWidth: '30px' }}>
+          <Typography variant="body2" style={{ minWidth: '30px', color: textColor }}>
             {fontSize}px
           </Typography>
-        </Box>
-        
-        {/* Left Margin Control */}
-        <Box display="flex" alignItems="center" gap={1}>
-          <Typography variant="body2" style={{ minWidth: 'fit-content' }}>
-            Left margin:
-          </Typography>
-          <Button
-            size="small"
-            variant="outlined"
-            onClick={() => adjustLeftMargin(-0.5)}
-            style={{ minWidth: '30px', padding: '4px' }}
-          >
-            ←
-          </Button>
-          <Typography variant="body2" style={{ minWidth: '50px', textAlign: 'center' }}>
-            {leftMargin}em
-          </Typography>
-          <Button
-            size="small"
-            variant="outlined"
-            onClick={() => adjustLeftMargin(0.5)}
-            style={{ minWidth: '30px', padding: '4px' }}
-          >
-            →
-          </Button>
         </Box>
       </Box>
       
@@ -876,7 +895,7 @@ function PlaylistCanvas({ coverArtData, markdown, backgroundColor, textColor }) 
                   } else if (part.startsWith('_') && part.endsWith('_')) {
                     return <em key={idx}>{part.slice(1, -1)}</em>;
                   } else if (part === '[NZ]') {
-                    return <span key={idx} style={{ color: '#1976d2', fontWeight: 'bold' }}>{part}</span>;
+                    return <span key={idx} style={{ fontWeight: 'bold' }}>{part}</span>;
                   } else {
                     return <span key={idx} style={{ color: 'inherit' }}>{part}</span>;
                   }
@@ -971,7 +990,7 @@ function ColorPickerFooter({ backgroundColor, setBackgroundColor, textColor, set
   );
 }
 
-function MarkdownOutput({ markdown }) {
+function MarkdownOutput({ markdown, textColor }) {
   const classes = useStyles();
   
   if (!markdown) {
@@ -985,10 +1004,18 @@ function MarkdownOutput({ markdown }) {
   return (
     <div>
       <Box display="flex" justifyContent="space-between" alignItems="center" mb={1}>
-        <Typography variant="h5">
+        <Typography variant="h5" style={{ color: textColor }}>
           Tracklist markdown
         </Typography>
-        <Button variant="outlined" size="small" onClick={handleCopy}>
+        <Button 
+          variant="outlined" 
+          size="small" 
+          onClick={handleCopy}
+          style={{
+            color: textColor,
+            borderColor: textColor
+          }}
+        >
           Copy to clipboard
         </Button>
       </Box>
@@ -1010,20 +1037,6 @@ function TracklistProcessor() {
   const [markdown, setMarkdown] = useState('');
   const [backgroundColor, setBackgroundColor] = useState('#ffffff'); // Default background color
   const [textColor, setTextColor] = useState('#000000'); // Default text color
-
-  const pickColor = async (setColor) => {
-    if ('EyeDropper' in window) {
-      try {
-        const eyeDropper = new window.EyeDropper();
-        const result = await eyeDropper.open();
-        setColor(result.sRGBHex);
-      } catch (error) {
-        console.log('User cancelled color picker or error occurred:', error);
-      }
-    } else {
-      alert('Color picker is not supported in this browser. Please use Chrome or Edge.');
-    }
-  };
 
   const handleUpdateResult = (index, updatedResult) => {
     const newResults = [...results];
@@ -1082,7 +1095,7 @@ function TracklistProcessor() {
     <div className={classes.container} style={{ backgroundColor, minHeight: '100vh', paddingBottom: '80px' }}>
       <div className={classes.header}>
         <div>
-          <Typography variant="h4" gutterBottom>
+          <Typography variant="h4" gutterBottom style={{ color: textColor }}>
             Tracklist to cover art & markdown
           </Typography>
           <Chip 
@@ -1093,7 +1106,7 @@ function TracklistProcessor() {
         </div>
       </div>
       
-      <Typography variant="body1" gutterBottom color="textSecondary">
+      <Typography variant="body1" gutterBottom style={{ color: textColor }}>
         Paste your tracklist below and we'll search Spotify to generate a cover art grid and formatted markdown.
       </Typography>
 
@@ -1107,6 +1120,15 @@ function TracklistProcessor() {
         value={tracklistText}
         onChange={(e) => setTracklistText(e.target.value)}
         disabled={isProcessing}
+        style={{
+          backgroundColor: 'white',
+        }}
+        InputProps={{
+          style: {
+            backgroundColor: 'white',
+            color: 'black',
+          }
+        }}
       />
 
       <Button
@@ -1123,7 +1145,7 @@ function TracklistProcessor() {
       {isProcessing && (
         <Box mb={3}>
           <LinearProgress />
-          <Typography variant="body2" align="center" style={{ marginTop: 8 }}>
+          <Typography variant="body2" align="center" style={{ marginTop: 8, color: textColor }}>
             Searching Spotify for tracks...
           </Typography>
         </Box>
@@ -1131,7 +1153,7 @@ function TracklistProcessor() {
 
       {results.length > 0 && !isProcessing && (
         <Box mb={3}>
-          <Typography variant="h6" gutterBottom>
+          <Typography variant="h6" gutterBottom style={{ color: textColor }}>
             Search results
           </Typography>
           <Box mb={2}>
@@ -1156,6 +1178,10 @@ function TracklistProcessor() {
               color="primary"
               onClick={handleAddTrack}
               startIcon={<span>+</span>}
+              style={{
+                color: textColor,
+                borderColor: textColor
+              }}
             >
               Add track
             </Button>
@@ -1163,11 +1189,11 @@ function TracklistProcessor() {
         </Box>
       )}
 
-      <CoverArtGrid coverArtData={coverArtData} />
+      <CoverArtGrid coverArtData={coverArtData} textColor={textColor} />
       
       <PlaylistCanvas coverArtData={coverArtData} markdown={markdown} backgroundColor={backgroundColor} textColor={textColor} />
       
-      <MarkdownOutput markdown={markdown} />
+      <MarkdownOutput markdown={markdown} textColor={textColor} />
       
       {/* Sticky Color Picker Footer */}
       <ColorPickerFooter 
