@@ -2,9 +2,9 @@
 
 Experimenting with different ways of visualising Spotify playlists - e.g. by artist or album.
 
-Live on [GitHub Pages](https://pages.github.com): https://landscape.cartoonbeats.com/ajugi/
+Live on [GitHub Pages](https://pages.github.com): https://lab.cartoonbeats.com/ajugi/
 
-<a href="https://landscape.cartoonbeats.com/ajugi/">![screenshot](doc/screenshot.png)</a>
+<a href="https://lab.cartoonbeats.com/ajugi/">![screenshot](doc/screenshot.png)</a>
 
 ## How to use
 
