@@ -8,7 +8,7 @@ const development = {
 
 const production = {
   clientId: "6a53c434d5ce4fc2adb439113a5a7ec5",
-  redirectUrl: "https://landscape.cartoonbeats.com/ajugi",
+  redirectUrl: "https://lab.cartoonbeats.com/ajugi",
 };
 
 const spotifyApp =
