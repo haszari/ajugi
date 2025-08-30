@@ -1,6 +1,54 @@
-# Ajugi - Spotify playlist explorer
+# Ajugi - playlist wrangling & music metadata tools
 
-Experimenting with different ways of visualising Spotify playlists - e.g. by artist or album.
+A tool for managing playlists for radio shows. 
+
+## How to use
+
+- Go to: https://lab.cartoonbeats.com/ajugi/
+- Log in / authenticate Spotify. 
+  - Your Spotify account is used to retrieve cover art images and search for music.
+- Paste a tracklist into the text box.
+- Click `Process tracklist`.
+
+When it's finished processing you can customise each track in the playlist:
+
+- Refine search to get the version, or fix a bad search result (i.e. there is a popular song squatting the top search result).
+- Delete / remove / hide tracks.
+- Add custom tracks with artist, title and uploaded cover art. E.g. unreleased or Bandcamp-only music, etc, anything not on Spotify.
+
+Then you can tweak the generated assets:
+
+- Edit the markdown used for the song in the list, e.g. to customise spelling or capitalisation.
+- Check a box to note that a song is an NZ artist.
+- Customize the colours of the rendered tracklist (requires Chrome for colour picker).
+
+And finally use the assets:
+
+- Screenshot the covers collage and tracklist image.
+- Copy and paste the markdown tracklist.
+
+## Screenshots
+
+![](screenshots/1-paste-tracklist.png)
+
+![](screenshots/2-refine-results.png)
+
+![](screenshots/3-unreleased.png)
+
+![](screenshots/4-cover-collage.png)
+
+![](screenshots/5-custom-colours.png)
+
+![](screenshots/6-markdown.png)
+
+
+## Development
+
+- `npm start` – run in dev mode
+- `npm run build` - production minified build into `build` folder
+- `npm run deploy` - production build and deploy to [GitHub Pages](https://pages.github.com)
+
+---
 
 Live on [GitHub Pages](https://pages.github.com): https://lab.cartoonbeats.com/ajugi/
 
